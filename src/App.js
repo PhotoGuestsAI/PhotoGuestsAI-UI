@@ -1,6 +1,8 @@
 import React, {useState, useEffect} from "react";
+import {BrowserRouter as Router, Routes, Route} from "react-router-dom"; // Import Router and Routes
 import {GoogleOAuthProvider, GoogleLogin} from "@react-oauth/google";
 import EventList from "./components/EventList";
+import EventDetail from "./components/EventDetail"; // Import the EventDetail component
 import "./App.css"; // Import the CSS file for styling
 
 const App = () => {
@@ -44,44 +46,45 @@ const App = () => {
 
     return (
         <GoogleOAuthProvider clientId="134801815902-ab4t528nqfnkadh4c93otdk80kcc1mhc.apps.googleusercontent.com">
-            <div className="container">
-                {!user ? (
-                    <>
-                        <div className="portfolio-section">
-                            <h1>Photo Guests AI</h1>
-                            <p>
-                                Welcome to Photo Guests AI, the easiest way to capture the memories of your events. Our
-                                service allows photographers to organize guest submissions, create personalized albums,
-                                and much more.
-                            </p>
-                            <p>
-                                Sign in below to get started and create your first event!
-                            </p>
-                            <GoogleLogin
-                                onSuccess={handleLoginSuccess}
-                                onError={() => console.error("Login Failed")}
-                                useOneTap
-                                render={(renderProps) => (
-                                    <button
-                                        onClick={renderProps.onClick}
-                                        className="google-sign-in-btn"
-                                        disabled={renderProps.disabled}
-                                    >
-                                        Sign in with Google
-                                    </button>
-                                )}
-                            />
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        <button onClick={handleLogout} className="logoutButton">
-                            Sign Out
-                        </button>
-                        <EventList user={user}/>
-                    </>
-                )}
-            </div>
+            <Router>
+                <div className="container">
+                    {!user ? (
+                        <>
+                            <div className="portfolio-section">
+                                <h1>Photo Guests AI</h1>
+                                <p>Welcome to Photo Guests AI, the easiest way to capture the memories of your
+                                    events.</p>
+                                <p>Sign in below to get started and create your first event!</p>
+                                <GoogleLogin
+                                    onSuccess={handleLoginSuccess}
+                                    onError={() => console.error("Login Failed")}
+                                    useOneTap
+                                    render={(renderProps) => (
+                                        <button
+                                            onClick={renderProps.onClick}
+                                            className="google-sign-in-btn"
+                                            disabled={renderProps.disabled}
+                                        >
+                                            Sign in with Google
+                                        </button>
+                                    )}
+                                />
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <button onClick={handleLogout} className="logoutButton">
+                                Sign Out
+                            </button>
+                            {/* Event List Component */}
+                            <Routes>
+                                <Route path="/" element={<EventList user={user}/>}/>
+                                <Route path="/events/:eventId" element={<EventDetail/>}/>
+                            </Routes>
+                        </>
+                    )}
+                </div>
+            </Router>
         </GoogleOAuthProvider>
     );
 };

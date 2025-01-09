@@ -1,0 +1,58 @@
+/* General Styles */
+.event-detail-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.event-name {
+    color: #1e88e5;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.event-date, .photographer-name, .event-status {
+    font-size: 16px;
+    color: #666;
+    margin: 5px 0;
+}
+
+/* Upload Section Styles */
+.upload-section {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.upload-section h3 {
+    font-size: 18px;
+    color: #333;
+}
+
+.file-input {
+    margin-top: 10px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+}
+
+/* Upload Button Styles */
+.upload-button {
+    background-color: #1e88e5;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.upload-button:hover {
+    background-color: #1565c0;
+}

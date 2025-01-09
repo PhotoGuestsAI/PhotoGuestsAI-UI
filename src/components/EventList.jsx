@@ -1,5 +1,7 @@
+// EventList.jsx
 import React, {useState, useEffect} from "react";
 import axios from "axios";
+import {Link} from "react-router-dom"; // Import Link from React Router for navigation
 import EventForm from "./EventForm";
 import EventCard from "./EventCard";
 import "../styles/EventList.css"; // CSS for styling
@@ -11,7 +13,9 @@ const EventList = ({user}) => {
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const response = await axios.get(`http://127.0.0.1:8000/events?email=${user.email}`);
+                const response = await axios.get(
+                    `http://127.0.0.1:8000/events?email=${user.email}`
+                );
                 setEvents(response.data);
             } catch (error) {
                 console.error("Error fetching events:", error);
@@ -44,7 +48,11 @@ const EventList = ({user}) => {
             {showForm && <EventForm user={user} onEventCreated={handleEventCreated}/>}
             <div className="events-container">
                 {events.length > 0 ? (
-                    events.map((event) => <EventCard key={event.event_id} event={event}/>)
+                    events.map((event) => (
+                        <Link to={`/events/${event.event_id}`} key={event.event_id}>
+                            <EventCard event={event}/>
+                        </Link>
+                    ))
                 ) : (
                     <p className="no-events-message">No events found. Create a new one!</p>
                 )}
