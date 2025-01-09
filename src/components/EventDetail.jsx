@@ -5,7 +5,6 @@ import "../styles/EventDetail.css"; // Import CSS for styling
 
 const EventDetail = () => {
     const [event, setEvent] = useState(null);
-    const [guestListFile, setGuestListFile] = useState(null);
     const [albumFile, setAlbumFile] = useState(null);
 
     const {eventId} = useParams(); // Get eventId from route params
@@ -29,42 +28,39 @@ const EventDetail = () => {
     }, [eventId]);
 
     const handleFileChange = (e) => {
-        if (e.target.name === "guestList") {
-            setGuestListFile(e.target.files[0]);
-        } else if (e.target.name === "album") {
+        if (e.target.name === "album") {
             setAlbumFile(e.target.files[0]);
         }
     };
 
+    // EventDetail.jsx (Frontend)
     const handleUpload = async () => {
-        if (!guestListFile || !albumFile) {
-            alert("Please select both files before uploading.");
+        if (!albumFile) {
+            alert("Please select the album zip file before uploading.");
             return;
         }
 
+        const formData = new FormData();
+        formData.append('album', albumFile);
+
         try {
-            // Upload the guest list CSV
-            const guestListUploadUrl = event.upload_urls.guest_list_upload_url;
-            await axios.put(guestListUploadUrl, guestListFile, {
-                headers: {
-                    "Content-Type": "application/csv",
-                },
-            });
-
-            // Upload the album ZIP file
-            const albumUploadUrl = event.upload_urls.album_upload_url;
-            await axios.put(albumUploadUrl, albumFile, {
-                headers: {
-                    "Content-Type": "application/zip",
-                },
-            });
-
-            alert("Files uploaded successfully!");
+            // Send the file to the backend to upload to S3
+            await axios.post(
+                `http://127.0.0.1:8000/events/${eventId}/upload-event-album`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    }
+                }
+            );
+            alert("File uploaded successfully!");
         } catch (error) {
-            console.error("Error uploading files:", error);
-            alert("An error occurred while uploading the files.");
+            console.error("Error uploading file:", error);
+            alert("An error occurred while uploading the file.");
         }
     };
+
 
     if (!event) {
         return <div>Loading...</div>;
@@ -76,17 +72,6 @@ const EventDetail = () => {
             <p className="event-date">Date: {event.event_date}</p>
             <p className="photographer-name">Photographer: {event.photographer_name}</p>
             <p className="event-status">Status: {event.status}</p>
-
-            <div className="upload-section">
-                <h3>Upload Guest List CSV</h3>
-                <input
-                    type="file"
-                    name="guestList"
-                    accept=".csv"
-                    onChange={handleFileChange}
-                    className="file-input"
-                />
-            </div>
 
             <div className="upload-section">
                 <h3>Upload Album Photos</h3>
