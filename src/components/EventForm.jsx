@@ -13,6 +13,24 @@ const EventForm = ({user, onEventCreated}) => {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [validationError, setValidationError] = useState("");
+
+    const validateForm = () => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const phoneRegex = /^[0-9]{10,15}$/;
+
+        if (!emailRegex.test(formData.email)) {
+            setValidationError("Invalid email format.");
+            return false;
+        }
+        if (!phoneRegex.test(formData.phone)) {
+            setValidationError("Phone number must be 10-15 digits.");
+            return false;
+        }
+
+        setValidationError(""); // Clear any previous validation errors
+        return true;
+    };
 
     const handleInputChange = (e) => {
         const {name, value} = e.target;
@@ -21,6 +39,8 @@ const EventForm = ({user, onEventCreated}) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!validateForm()) return;
+
         setLoading(true);
         setError("");
 
@@ -38,6 +58,7 @@ const EventForm = ({user, onEventCreated}) => {
     return (
         <div className="event-form-container">
             <h2>Create a New Event</h2>
+            {validationError && <p className="error-message">{validationError}</p>}
             {error && <p className="error-message">{error}</p>}
             <form onSubmit={handleSubmit} className="event-form">
                 <div className="form-group">

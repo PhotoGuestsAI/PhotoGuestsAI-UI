@@ -29,20 +29,17 @@ const App = () => {
     return (
         <GoogleOAuthProvider clientId="134801815902-ab4t528nqfnkadh4c93otdk80kcc1mhc.apps.googleusercontent.com">
             <div>
-                <h1>Photo Guests AI</h1>
-                {user ? (
-                    <div>
-                        <h2>Welcome, {user.name}!</h2>
-                        <img src={user.picture} alt={user.name}/>
-                        <p>Email: {user.email}</p>
-                        {/* Event management functionality */}
-                        <EventList user={user}/>
-                    </div>
-                ) : (
+                {/* Conditionally render header */}
+                {!user ? (
                     <GoogleLogin
                         onSuccess={handleLoginSuccess}
                         onError={() => console.error("Login Failed")}
                     />
+                ) : (
+                    <>
+                        {/* Event management functionality */}
+                        <EventList user={user}/>
+                    </>
                 )}
             </div>
         </GoogleOAuthProvider>

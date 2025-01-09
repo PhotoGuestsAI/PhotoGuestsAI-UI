@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react";
 import axios from "axios";
 import EventForm from "./EventForm";
 import EventCard from "./EventCard";
-import "../styles/EventList.css"; // Optional CSS for styling
+import "../styles/EventList.css"; // CSS for styling
 
 const EventList = ({user}) => {
     const [events, setEvents] = useState([]);
@@ -25,18 +25,22 @@ const EventList = ({user}) => {
 
     const handleEventCreated = (newEvent) => {
         setEvents((prevEvents) => [...prevEvents, newEvent]); // Append the new event
-        setShowForm(false); // Hide the form after successful event creation
+        setShowForm(false); // Hide the form after event creation
     };
 
     return (
         <div className="event-list-container">
-            <h1>Welcome, {user.name}!</h1>
-            <button
-                className="toggle-form-button"
-                onClick={() => setShowForm((prev) => !prev)}
-            >
-                {showForm ? "Cancel" : "Create New Event"}
-            </button>
+            {!showForm && (
+                <div className="welcome-container">
+                    <h1>Welcome, {user.name}!</h1>
+                    <button
+                        className="toggle-form-button"
+                        onClick={() => setShowForm((prev) => !prev)}
+                    >
+                        Create New Event
+                    </button>
+                </div>
+            )}
             {showForm && <EventForm user={user} onEventCreated={handleEventCreated}/>}
             <div className="events-container">
                 {events.length > 0 ? (

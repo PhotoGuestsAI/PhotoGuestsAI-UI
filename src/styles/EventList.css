@@ -38,3 +38,12 @@ h1 {
     color: #666;
     margin-top: 20px;
 }
+
+.welcome-container {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.toggle-form-button {
+    margin-top: 10px;
+}
