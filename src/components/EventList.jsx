@@ -2,13 +2,13 @@ import React, {useState, useEffect} from "react";
 import axios from "axios";
 import EventForm from "./EventForm";
 import EventCard from "./EventCard";
+import "../styles/EventList.css"; // Optional CSS for styling
 
 const EventList = ({user}) => {
     const [events, setEvents] = useState([]);
     const [showForm, setShowForm] = useState(false);
 
     useEffect(() => {
-        // Fetch user's events only once
         const fetchEvents = async () => {
             try {
                 const response = await axios.get(`http://127.0.0.1:8000/events?email=${user.email}`);
@@ -21,25 +21,28 @@ const EventList = ({user}) => {
         if (user?.email) {
             fetchEvents();
         }
-    }, [user?.email]); // Only run when `user.email` changes
+    }, [user?.email]);
 
     const handleEventCreated = (newEvent) => {
-        setEvents([...events, newEvent]);
-        setShowForm(false);
+        setEvents((prevEvents) => [...prevEvents, newEvent]); // Append the new event
+        setShowForm(false); // Hide the form after successful event creation
     };
 
     return (
-        <div>
+        <div className="event-list-container">
             <h1>Welcome, {user.name}!</h1>
-            <button onClick={() => setShowForm(!showForm)}>
+            <button
+                className="toggle-form-button"
+                onClick={() => setShowForm((prev) => !prev)}
+            >
                 {showForm ? "Cancel" : "Create New Event"}
             </button>
             {showForm && <EventForm user={user} onEventCreated={handleEventCreated}/>}
-            <div>
+            <div className="events-container">
                 {events.length > 0 ? (
                     events.map((event) => <EventCard key={event.event_id} event={event}/>)
                 ) : (
-                    <p>No events found. Create a new one!</p>
+                    <p className="no-events-message">No events found. Create a new one!</p>
                 )}
             </div>
         </div>

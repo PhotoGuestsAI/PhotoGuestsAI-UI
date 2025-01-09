@@ -1,61 +1,83 @@
 import React, {useState} from "react";
 import axios from "axios";
+import "../styles/EventForm.css"; // Import styles
 
 const EventForm = ({user, onEventCreated}) => {
-    const [eventName, setEventName] = useState("");
-    const [eventDate, setEventDate] = useState("");
-    const [phone, setPhone] = useState("");
+    const [formData, setFormData] = useState({
+        event_name: "",
+        event_date: "",
+        phone: "",
+        photographer_name: user?.name || "",
+        email: user?.email || "",
+    });
+
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    const handleInputChange = (e) => {
+        const {name, value} = e.target;
+        setFormData((prevData) => ({...prevData, [name]: value}));
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        const newEvent = {
-            event_name: eventName,
-            event_date: eventDate,
-            phone: phone,
-            email: user.email,
-            photographer_name: user.name,
-        };
+        setLoading(true);
+        setError("");
 
         try {
-            const response = await axios.post("http://127.0.0.1:8000/events/", newEvent);
-            onEventCreated(response.data); // Notify parent component
-        } catch (error) {
-            console.error("Error creating event:", error);
+            const response = await axios.post("http://127.0.0.1:8000/events/", formData);
+            onEventCreated(response.data);
+        } catch (err) {
+            setError("Failed to create the event. Please try again.");
+            console.error(err);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div>
-                <label>Event Name:</label>
-                <input
-                    type="text"
-                    value={eventName}
-                    onChange={(e) => setEventName(e.target.value)}
-                    required
-                />
-            </div>
-            <div>
-                <label>Event Date:</label>
-                <input
-                    type="date"
-                    value={eventDate}
-                    onChange={(e) => setEventDate(e.target.value)}
-                    required
-                />
-            </div>
-            <div>
-                <label>Phone:</label>
-                <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    required
-                />
-            </div>
-            <button type="submit">Create Event</button>
-        </form>
+        <div className="event-form-container">
+            <h2>Create a New Event</h2>
+            {error && <p className="error-message">{error}</p>}
+            <form onSubmit={handleSubmit} className="event-form">
+                <div className="form-group">
+                    <label htmlFor="event_name">Event Name:</label>
+                    <input
+                        type="text"
+                        id="event_name"
+                        name="event_name"
+                        value={formData.event_name}
+                        onChange={handleInputChange}
+                        required
+                    />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="event_date">Event Date:</label>
+                    <input
+                        type="date"
+                        id="event_date"
+                        name="event_date"
+                        value={formData.event_date}
+                        onChange={handleInputChange}
+                        required
+                    />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="phone">Phone Number:</label>
+                    <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        required
+                    />
+                </div>
+                <button type="submit" className="submit-button" disabled={loading}>
+                    {loading ? "Creating..." : "Create Event"}
+                </button>
+            </form>
+        </div>
     );
 };
 
