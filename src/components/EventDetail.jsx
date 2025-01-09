@@ -1,3 +1,4 @@
+// EventDetail.jsx
 import React, {useState, useEffect} from "react";
 import axios from "axios";
 import {useParams} from "react-router-dom"; // Use useParams to get route params
@@ -55,12 +56,14 @@ const EventDetail = () => {
                 }
             );
             alert("File uploaded successfully!");
+            // Refetch event details to update the status
+            const response = await axios.get(`http://127.0.0.1:8000/events/${eventId}`);
+            setEvent(response.data);  // Update the event details with new status
         } catch (error) {
             console.error("Error uploading file:", error);
             alert("An error occurred while uploading the file.");
         }
     };
-
 
     if (!event) {
         return <div>Loading...</div>;
@@ -74,7 +77,8 @@ const EventDetail = () => {
             <p className="event-status">Status: {event.status}</p>
 
             <div className="upload-section">
-                <h3>Upload Album Photos</h3>
+                <br/>
+                <h3>Upload / Replace the Album</h3>
                 <input
                     type="file"
                     name="album"
