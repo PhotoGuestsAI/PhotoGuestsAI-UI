@@ -3,6 +3,7 @@ import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import {GoogleOAuthProvider, GoogleLogin} from "@react-oauth/google";
 import EventList from "./components/EventList";
 import EventDetail from "./components/EventDetail";
+import GuestSubmissionForm from "./components/GuestSubmissionForm"; // Add this import
 import "./App.css";
 
 const App = () => {
@@ -80,6 +81,7 @@ const App = () => {
                             <Routes>
                                 <Route path="/" element={<EventList user={user}/>}/>
                                 <Route path="/events/:eventId" element={<EventDetail/>}/>
+                                <Route path="/guest-form/:eventId" element={<GuestSubmissionForm/>}/> {/* New route */}
                             </Routes>
                         </>
                     )}

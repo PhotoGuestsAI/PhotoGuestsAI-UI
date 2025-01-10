@@ -1,13 +1,13 @@
-// EventDetail.jsx
 import React, {useState, useEffect} from "react";
 import axios from "axios";
 import {useParams} from "react-router-dom"; // Use useParams to get route params
 import "../styles/EventDetail.css"; // Import CSS for styling
+import EventQRCode from "./EventQRCode"; // Import the EventQRCode component
 
 const EventStatus = {
     PENDING_UPLOAD: "Pending Upload",
     ALBUM_UPLOADED: "Album Uploaded",
-    COMPLETED: "Completed"
+    COMPLETED: "Completed",
 };
 
 const EventDetail = () => {
@@ -40,7 +40,6 @@ const EventDetail = () => {
         }
     };
 
-    // EventDetail.jsx (Frontend)
     const handleUpload = async () => {
         if (!albumFile) {
             alert("Please select the album zip file before uploading.");
@@ -48,23 +47,22 @@ const EventDetail = () => {
         }
 
         const formData = new FormData();
-        formData.append('album', albumFile);
+        formData.append("album", albumFile);
 
         try {
-            // Send the file to the backend to upload to S3
             await axios.post(
                 `http://127.0.0.1:8000/events/${eventId}/upload-event-album`,
                 formData,
                 {
                     headers: {
-                        'Content-Type': 'multipart/form-data',
-                    }
+                        "Content-Type": "multipart/form-data",
+                    },
                 }
             );
             alert("File uploaded successfully!");
             // Refetch event details to update the status
             const response = await axios.get(`http://127.0.0.1:8000/events/${eventId}`);
-            setEvent(response.data);  // Update the event details with new status
+            setEvent(response.data); // Update the event details with new status
         } catch (error) {
             console.error("Error uploading file:", error);
             alert("An error occurred while uploading the file.");
@@ -76,7 +74,10 @@ const EventDetail = () => {
     }
 
     // Determine text for upload button based on event status
-    const uploadButtonText = event.status === EventStatus.ALBUM_UPLOADED ? "Replace the Album" : "Upload the Album";
+    const uploadButtonText =
+        event.status === EventStatus.ALBUM_UPLOADED
+            ? "Replace the Album"
+            : "Upload the Album";
 
     return (
         <div className="event-detail-container">
@@ -97,7 +98,14 @@ const EventDetail = () => {
                 />
             </div>
 
-            <button onClick={handleUpload} className="upload-button">{uploadButtonText}</button>
+            <button onClick={handleUpload} className="upload-button">
+                {uploadButtonText}
+            </button>
+
+            {/* Display the Event QR Code for guest form */}
+            <div className="qr-code-section">
+                <EventQRCode eventId={event.event_id}/>
+            </div>
         </div>
     );
 };
