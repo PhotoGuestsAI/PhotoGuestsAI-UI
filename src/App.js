@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from "react";
-import {BrowserRouter as Router, Routes, Route} from "react-router-dom"; // Import Router and Routes
+import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import {GoogleOAuthProvider, GoogleLogin} from "@react-oauth/google";
 import EventList from "./components/EventList";
-import EventDetail from "./components/EventDetail"; // Import the EventDetail component
-import "./App.css"; // Import the CSS file for styling
+import EventDetail from "./components/EventDetail";
+import "./App.css";
 
 const App = () => {
     const [user, setUser] = useState(null);
@@ -12,7 +12,7 @@ const App = () => {
     useEffect(() => {
         const savedUser = localStorage.getItem("user");
         if (savedUser) {
-            setUser(JSON.parse(savedUser)); // Parse and set the user from localStorage
+            setUser(JSON.parse(savedUser));
         }
     }, []);
 

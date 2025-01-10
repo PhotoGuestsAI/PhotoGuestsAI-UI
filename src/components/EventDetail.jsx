@@ -4,6 +4,12 @@ import axios from "axios";
 import {useParams} from "react-router-dom"; // Use useParams to get route params
 import "../styles/EventDetail.css"; // Import CSS for styling
 
+const EventStatus = {
+    PENDING_UPLOAD: "Pending Upload",
+    ALBUM_UPLOADED: "Album Uploaded",
+    COMPLETED: "Completed"
+};
+
 const EventDetail = () => {
     const [event, setEvent] = useState(null);
     const [albumFile, setAlbumFile] = useState(null);
@@ -69,6 +75,9 @@ const EventDetail = () => {
         return <div>Loading...</div>;
     }
 
+    // Determine text for upload button based on event status
+    const uploadButtonText = event.status === EventStatus.ALBUM_UPLOADED ? "Replace the Album" : "Upload the Album";
+
     return (
         <div className="event-detail-container">
             <h2 className="event-name">{event.event_name}</h2>
@@ -78,7 +87,7 @@ const EventDetail = () => {
 
             <div className="upload-section">
                 <br/>
-                <h3>Upload / Replace the Album</h3>
+                <h3>{uploadButtonText}</h3>
                 <input
                     type="file"
                     name="album"
@@ -88,7 +97,7 @@ const EventDetail = () => {
                 />
             </div>
 
-            <button onClick={handleUpload} className="upload-button">Upload Files</button>
+            <button onClick={handleUpload} className="upload-button">{uploadButtonText}</button>
         </div>
     );
 };
