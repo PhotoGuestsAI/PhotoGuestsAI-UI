@@ -1,0 +1,53 @@
+/* HomePage.css */
+.home-page-container {
+    text-align: center;
+    margin: 20px;
+}
+
+.home-page-header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.home-page-header h1 {
+    font-size: 36px;
+}
+
+.home-page-header p {
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+.service-description {
+    margin: 30px 0;
+}
+
+.service-description h2 {
+    font-size: 28px;
+}
+
+.service-description p {
+    font-size: 18px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.cta-button {
+    margin-top: 20px;
+}
+
+.event-list-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.create-event-button:hover {
+    background-color: #45a049;
+}
