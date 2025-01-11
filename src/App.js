@@ -79,7 +79,7 @@ const App = () => {
                             <Route path="/" element={<HomePage/>}/>
                             <Route path="/events" element={user ? <EventList user={user}/> : <Navigate to="/"/>}/>
                             <Route path="/events/:eventId" element={user ? <EventDetail/> : <Navigate to="/"/>}/>
-                            <Route path="/guest-form/:eventId"
+                            <Route path="/events/:eventId/guest-form"
                                    element={user ? <GuestSubmissionForm/> : <Navigate to="/"/>}/>
                         </Routes>
                     )}

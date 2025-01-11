@@ -1,49 +1,73 @@
-/* EventDetail.css */
 .event-detail-container {
     padding: 20px;
-    max-width: 600px;
+    max-width: 700px;
     margin: 0 auto;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
 }
 
 .event-name {
-    font-size: 24px;
-    font-weight: bold;
+    font-size: 28px;
+    font-weight: 700;
     color: #1e88e5;
+    margin-bottom: 10px;
 }
 
-.event-date, .photographer-name, .event-status {
-    font-size: 16px;
-    color: #666;
+.event-date, .event-status {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 10px;
 }
 
 .upload-section {
-    margin-top: 20px;
+    margin-top: 25px;
 }
 
 .file-input {
-    margin-top: 10px;
-    padding: 8px;
+    margin-top: 12px;
+    padding: 10px;
     font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
     width: 100%;
+    background-color: #f9f9f9;
 }
 
 .upload-button {
     margin-top: 20px;
-    padding: 10px 20px;
+    padding: 12px 24px;
     background-color: #1e88e5;
-    color: white;
+    color: #ffffff;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 18px;
     width: 100%;
+    transition: background-color 0.3s ease;
 }
 
 .upload-button:hover {
     background-color: #1565c0;
+}
+
+.qr-code-section {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.guest-form-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.guest-form-link a {
+    font-size: 16px;
+    color: #1e88e5;
+    text-decoration: none;
+}
+
+.guest-form-link a:hover {
+    text-decoration: underline;
 }

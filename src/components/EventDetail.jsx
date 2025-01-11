@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useCallback} from "react";
 import axios from "axios";
-import {useParams, useNavigate} from "react-router-dom"; // Use useNavigate hook for navigation
+import {useParams, useNavigate, Link} from "react-router-dom"; // Import Link for navigation
 import "../styles/EventDetail.css"; // Import CSS for styling
 import EventQRCode from "./EventQRCode"; // Import the EventQRCode component
 
@@ -109,7 +109,6 @@ const EventDetail = () => {
         <div className="event-detail-container">
             <h2 className="event-name">{event.event_name}</h2>
             <p className="event-date">Date: {event.event_date}</p>
-            <p className="photographer-name">Photographer: {event.photographer_name}</p>
             <p className="event-status">Status: {event.status}</p>
 
             <div className="upload-section">
@@ -131,6 +130,13 @@ const EventDetail = () => {
             {/* Display the Event QR Code for guest form */}
             <div className="qr-code-section">
                 <EventQRCode eventId={event.event_id}/>
+            </div>
+
+            {/* Add a link under the QR code to the guest submission form */}
+            <div className="guest-form-link">
+                <Link to={`/events/${event.event_id}/guest-form`}>
+                    Fill out the Guest Submission Form
+                </Link>
             </div>
         </div>
     );
