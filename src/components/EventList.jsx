@@ -13,7 +13,10 @@ const EventList = ({user}) => {
         const fetchEvents = async () => {
             try {
                 const response = await axios.get(
-                    `http://127.0.0.1:8000/events?email=${user.email}`
+                    `http://127.0.0.1:8000/events?email=${user.email}`, {
+                    headers: {
+                        Authorization: `Bearer ${user.token}`, // Include the JWT token in the Authorization header
+                    },}
                 );
                 setEvents(response.data);
             } catch (error) {

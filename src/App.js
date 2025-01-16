@@ -33,8 +33,15 @@ const AppContent = ({user, setUser}) => {
             }
 
             const data = await response.json();
-            setUser(data.user);
-            localStorage.setItem("user", JSON.stringify(data.user));
+
+            // Add token to the user object
+            const userWithToken = {
+                ...data.user,
+                token: credential, // Include the Google ID token
+            };
+
+            setUser(userWithToken);
+            localStorage.setItem("user", JSON.stringify(userWithToken));
         } catch (error) {
             console.error("Error verifying Google token:", error);
         }
