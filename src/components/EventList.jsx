@@ -13,10 +13,12 @@ const EventList = ({user}) => {
         const fetchEvents = async () => {
             try {
                 const response = await axios.get(
-                    `http://127.0.0.1:8000/events?email=${user.email}`, {
-                    headers: {
-                        Authorization: `Bearer ${user.token}`, // Include the JWT token in the Authorization header
-                    },}
+                    "http://127.0.0.1:8000/events", // Removed email query param
+                    {
+                        headers: {
+                            Authorization: `Bearer ${user.token}`, // Include the JWT token in the Authorization header
+                        },
+                    }
                 );
                 setEvents(response.data);
             } catch (error) {
@@ -24,10 +26,10 @@ const EventList = ({user}) => {
             }
         };
 
-        if (user?.email) {
-            fetchEvents();
+        if (user?.token) {
+            fetchEvents(); // Ensure token exists before making the request
         }
-    }, [user?.email]);
+    }, [user?.token]);
 
     const handleEventCreated = (newEvent) => {
         setEvents((prevEvents) => [...prevEvents, newEvent]); // Append the new event

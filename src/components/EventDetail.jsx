@@ -1,8 +1,8 @@
 import React, {useState, useEffect, useCallback} from "react";
 import axios from "axios";
-import {useParams, useNavigate, Link} from "react-router-dom"; // Import Link for navigation
-import "../styles/EventDetail.css"; // Import CSS for styling
-import EventQRCode from "./EventQRCode"; // Import the EventQRCode component
+import {useParams, useNavigate, Link} from "react-router-dom";
+import "../styles/EventDetail.css";
+import EventQRCode from "./EventQRCode";
 
 const EventStatus = {
     PENDING_UPLOAD: "Pending Upload",
@@ -15,43 +15,52 @@ const EventDetail = () => {
     const [albumFile, setAlbumFile] = useState(null);
     const [isAuthorized, setIsAuthorized] = useState(false);
 
-    const {eventId} = useParams(); // Get eventId from route params
-    const navigate = useNavigate(); // Use useNavigate hook for navigation
+    const {eventId} = useParams();
+    const navigate = useNavigate();
 
-    // Function to check authorization based on localStorage email
-    const checkAuthorization = useCallback((eventEmail) => {
-        const user = JSON.parse(localStorage.getItem("user"));
-        const userEmail = user?.email;
+    const user = JSON.parse(localStorage.getItem("user"));
 
-        if (userEmail === eventEmail) {
-            setIsAuthorized(true);
-        } else {
-            setIsAuthorized(false);
-            alert("You are not authorized to view this event.");
-            navigate("/"); // Redirect to homepage or any other route you choose
-        }
-    }, [navigate]);
+    // Function to check authorization
+    const checkAuthorization = useCallback(
+        (eventEmail) => {
+            const userEmail = user?.email;
 
-    // Memoize the fetchEventDetails function
+            if (userEmail === eventEmail) {
+                setIsAuthorized(true);
+            } else {
+                setIsAuthorized(false);
+                alert("You are not authorized to view this event.");
+                navigate("/");
+            }
+        },
+        [navigate, user?.email]
+    );
+
+    // Fetch event details
     const fetchEventDetails = useCallback(async () => {
         try {
-            const response = await axios.get(`http://127.0.0.1:8000/events/${eventId}`);
-            console.log("Event Details: ", response.data);
+            const response = await axios.get(
+                `http://127.0.0.1:8000/events/${eventId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${user?.token}`,
+                    },
+                }
+            );
             setEvent(response.data);
-
-            // Check authorization
             checkAuthorization(response.data.email);
         } catch (error) {
             console.error("Error fetching event details:", error);
+            alert("An error occurred while fetching event details.");
         }
-    }, [eventId, checkAuthorization]); // Only depend on eventId and checkAuthorization
+    }, [eventId, checkAuthorization, user?.token]);
 
-    // Ensure the fetchEventDetails function is called when the eventId changes
+    // Fetch event details on component mount
     useEffect(() => {
-        if (eventId) {
-            fetchEventDetails();  // No need to return a promise here
+        if (eventId && user?.token) {
+            fetchEventDetails();
         }
-    }, [eventId, fetchEventDetails]);  // Include fetchEventDetails in the dependency array
+    }, [eventId, user?.token, fetchEventDetails]);
 
     // Handle album file selection
     const handleFileChange = (e) => {
@@ -77,13 +86,12 @@ const EventDetail = () => {
                 {
                     headers: {
                         "Content-Type": "multipart/form-data",
+                        Authorization: `Bearer ${user?.token}`,
                     },
                 }
             );
             alert("File uploaded successfully!");
-            // Refetch event details to update the status
-            const response = await axios.get(`http://127.0.0.1:8000/events/${eventId}`);
-            setEvent(response.data); // Update the event details with new status
+            fetchEventDetails(); // Refetch event details to update the status
         } catch (error) {
             console.error("Error uploading file:", error);
             alert("An error occurred while uploading the file.");
@@ -94,12 +102,10 @@ const EventDetail = () => {
         return <div>Loading...</div>;
     }
 
-    // Check if the user is authorized to view the event details
     if (!isAuthorized) {
         return <div>You are not authorized to view this event.</div>;
     }
 
-    // Determine text for upload button based on event status
     const uploadButtonText =
         event.status === EventStatus.ALBUM_UPLOADED
             ? "Replace the Album"
@@ -127,12 +133,10 @@ const EventDetail = () => {
                 {uploadButtonText}
             </button>
 
-            {/* Display the Event QR Code for guest form */}
             <div className="qr-code-section">
                 <EventQRCode eventId={event.event_id}/>
             </div>
 
-            {/* Add a link under the QR code to the guest submission form */}
             <div className="guest-form-link">
                 <Link to={`/events/${event.event_id}/guest-form`}>
                     Fill out the Guest Submission Form
