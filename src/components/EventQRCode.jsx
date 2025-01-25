@@ -1,8 +1,8 @@
 import React from 'react';
-import {QRCodeCanvas} from 'qrcode.react';  // Import QRCodeCanvas from qrcode.react
+import {QRCodeCanvas} from 'qrcode.react';
 
 const EventQRCode = ({eventId}) => {
-    const eventFormUrl = `http://localhost:3000/guest-form/${eventId}`;  // Link to the form
+    const eventFormUrl = `http://localhost:3000/guest-form/${eventId}`;
 
     return (
         <div>

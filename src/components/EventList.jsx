@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from "react";
 import axios from "axios";
-import {Link} from "react-router-dom"; // Import Link from React Router for navigation
+import {Link} from "react-router-dom";
 import EventForm from "./EventForm";
 import EventCard from "./EventCard";
-import "../styles/EventList.css"; // CSS for styling
+import "../styles/EventList.css";
 
 const EventList = ({user}) => {
     const [events, setEvents] = useState([]);
