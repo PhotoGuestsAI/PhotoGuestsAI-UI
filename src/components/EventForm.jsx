@@ -4,10 +4,10 @@ import "../styles/EventForm.css"; // Import styles
 
 const EventForm = ({user, onEventCreated}) => {
     const [formData, setFormData] = useState({
-        event_name: "",
-        event_date: "",
+        name: "",
+        date: "",
         phone: "",
-        photographer_name: user?.name || "",
+        username: user?.name || "",
         email: user?.email || "",
     });
 
@@ -66,8 +66,8 @@ const EventForm = ({user, onEventCreated}) => {
                     <input
                         type="text"
                         id="event_name"
-                        name="event_name"
-                        value={formData.event_name}
+                        name="name"
+                        value={formData.name}
                         onChange={handleInputChange}
                         required
                     />
@@ -77,8 +77,8 @@ const EventForm = ({user, onEventCreated}) => {
                     <input
                         type="date"
                         id="event_date"
-                        name="event_date"
-                        value={formData.event_date}
+                        name="date"
+                        value={formData.date}
                         onChange={handleInputChange}
                         required
                     />

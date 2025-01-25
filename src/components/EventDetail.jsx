@@ -113,8 +113,8 @@ const EventDetail = () => {
 
     return (
         <div className="event-detail-container">
-            <h2 className="event-name">{event.event_name}</h2>
-            <p className="event-date">Date: {event.event_date}</p>
+            <h2 className="event-name">{event.name}</h2>
+            <p className="event-date">Date: {event.date}</p>
             <p className="event-status">Status: {event.status}</p>
 
             <div className="upload-section">

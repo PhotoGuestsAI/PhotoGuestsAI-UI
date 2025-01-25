@@ -8,7 +8,6 @@ import "./App.css";
 import Navbar from "./components/Navbar";
 import HomePage from "./components/HomePage";
 
-// Create a wrapper component to use the useNavigate hook
 const AppContent = ({user, setUser}) => {
     const navigate = useNavigate();
 
