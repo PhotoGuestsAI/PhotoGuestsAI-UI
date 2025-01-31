@@ -3,32 +3,58 @@ import axios from "axios";
 import "../styles/GuestSubmissionForm.css";
 import {useParams} from "react-router-dom";
 
+const countryCodes = {
+    "IL": "+972", // Israel
+    "US": "+1",   // United States
+    "UK": "+44",  // United Kingdom
+    "IN": "+91",  // India
+};
+
 const GuestSubmissionForm = () => {
     const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
+    const [countryCode, setCountryCode] = useState("+972"); // Default to Israel
     const [photo, setPhoto] = useState(null);
     const [message, setMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
 
     const {eventId} = useParams(); // Get eventId from route params
 
-
+    // Validate phone number (should be 9 digits for Israel)
     const validatePhoneNumber = (phoneNumber) => {
-        const phoneRegex = /^[0-9]{10}$/;
+        const phoneRegex = /^[0-9]{7,12}$/; // Adjusted for international formats
         return phoneRegex.test(phoneNumber);
     };
+
+    const formatPhoneNumberForWhatsApp = (countryCode, phone) => {
+        let formattedPhone = phone.replace(/^0+/, ""); // Remove leading zero(s)
+
+        // Special handling for Argentina and Mexico
+        if (countryCode === "+54" && !formattedPhone.startsWith("9")) {
+            formattedPhone = "9" + formattedPhone;
+        }
+        if (countryCode === "+52" && !formattedPhone.startsWith("1")) {
+            formattedPhone = "1" + formattedPhone;
+        }
+
+        return countryCode.replace("+", "") + formattedPhone;
+    };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!validatePhoneNumber(phone)) {
-            setErrorMessage("Please enter a valid 10-digit phone number.");
+            setErrorMessage("Please enter a valid phone number.");
             return;
         }
 
+        const finalPhoneNumber = formatPhoneNumberForWhatsApp(countryCode, phone);
+        console.log("Formatted WhatsApp Number:", finalPhoneNumber);
+
         const formData = new FormData();
         formData.append("name", name);
-        formData.append("phone", phone);
+        formData.append("phone", finalPhoneNumber);
         formData.append("photo", photo);
 
         try {
@@ -61,6 +87,17 @@ const GuestSubmissionForm = () => {
                         required
                         placeholder="Enter your full name"
                     />
+                </div>
+
+                <div className="form-group">
+                    <label>Country Code</label>
+                    <select value={countryCode} onChange={(e) => setCountryCode(e.target.value)}>
+                        {Object.entries(countryCodes).map(([country, code]) => (
+                            <option key={country} value={code}>
+                                {country} ({code})
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 <div className="form-group">
