@@ -31,9 +31,17 @@ const EventList = ({user}) => {
         }
     }, [user?.token]);
 
-    const handleEventCreated = (newEvent) => {
-        setEvents((prevEvents) => [...prevEvents, newEvent]); // Append the new event
-        setShowForm(false); // Hide the form after event creation
+    const handleEventCreated = async (newEvent) => {
+        setShowForm(false);
+
+        try {
+            const response = await axios.get("http://127.0.0.1:8000/events", {
+                headers: {Authorization: `Bearer ${user.token}`},
+            });
+            setEvents(response.data);
+        } catch (error) {
+            console.error("Error refreshing events:", error);
+        }
     };
 
     return (
