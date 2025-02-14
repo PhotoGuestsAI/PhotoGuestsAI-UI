@@ -1,14 +1,8 @@
-import React, {useState, useEffect, useCallback} from "react";
+import {useState, useEffect} from "react";
 import axios from "axios";
 import {useParams, useNavigate, Link} from "react-router-dom";
-import "../styles/EventDetail.css";
 import EventQRCode from "./EventQRCode";
-
-const EventStatus = {
-    PENDING_UPLOAD: "Pending Upload",
-    ALBUM_UPLOADED: "Album Uploaded",
-    COMPLETED: "Completed",
-};
+import {Calendar, Upload} from "lucide-react";
 
 const EventDetail = () => {
     const [event, setEvent] = useState(null);
@@ -17,128 +11,87 @@ const EventDetail = () => {
 
     const {eventId} = useParams();
     const navigate = useNavigate();
-
     const user = JSON.parse(localStorage.getItem("user"));
 
-    // Function to check authorization
-    const checkAuthorization = useCallback(
-        (eventEmail) => {
-            const userEmail = user?.email;
+    const checkAuthorization = (eventEmail) => {
+        const userEmail = user?.email;
+        setIsAuthorized(userEmail === eventEmail);
+        if (userEmail !== eventEmail) {
+            alert("You are not authorized to view this event.");
+            navigate("/");
+        }
+    };
 
-            if (userEmail === eventEmail) {
-                setIsAuthorized(true);
-            } else {
-                setIsAuthorized(false);
-                alert("You are not authorized to view this event.");
-                navigate("/");
-            }
-        },
-        [navigate, user?.email]
-    );
-
-    // Fetch event details
-    const fetchEventDetails = useCallback(async () => {
+    const fetchEventDetails = async () => {
         try {
-            const response = await axios.get(
-                `http://127.0.0.1:8000/events/${eventId}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${user?.token}`,
-                    },
-                }
-            );
+            const response = await axios.get(`http://127.0.0.1:8000/events/${eventId}`, {
+                headers: {Authorization: `Bearer ${user?.token}`},
+            });
             setEvent(response.data);
             checkAuthorization(response.data.email);
         } catch (error) {
             console.error("Error fetching event details:", error);
             alert("An error occurred while fetching event details.");
         }
-    }, [eventId, checkAuthorization, user?.token]);
+    };
 
-    // Fetch event details on component mount
     useEffect(() => {
         if (eventId && user?.token) {
             fetchEventDetails();
         }
-    }, [eventId, user?.token, fetchEventDetails]);
+    }, [eventId, user?.token]); // Removed unnecessary dependencies
 
-    // Handle album file selection
-    const handleFileChange = (e) => {
-        if (e.target.name === "album") {
-            setAlbumFile(e.target.files[0]);
-        }
-    };
 
-    // Handle album file upload
+    const handleFileChange = (e) => setAlbumFile(e.target.files[0]);
+
     const handleUpload = async () => {
-        if (!albumFile) {
-            alert("Please select the album zip file before uploading.");
-            return;
-        }
+        if (!albumFile) return alert("Please select a file before uploading.");
 
         const formData = new FormData();
         formData.append("album", albumFile);
 
         try {
-            await axios.post(
-                `http://127.0.0.1:8000/events/${eventId}/upload-event-album`,
-                formData,
-                {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                        Authorization: `Bearer ${user?.token}`,
-                    },
-                }
-            );
+            await axios.post(`http://127.0.0.1:8000/events/${eventId}/upload-event-album`, formData, {
+                headers: {"Content-Type": "multipart/form-data", Authorization: `Bearer ${user?.token}`},
+            });
             alert("File uploaded successfully!");
-            fetchEventDetails(); // Refetch event details to update the status
+            fetchEventDetails();
         } catch (error) {
             console.error("Error uploading file:", error);
             alert("An error occurred while uploading the file.");
         }
     };
 
-    if (!event) {
-        return <div>Loading...</div>;
-    }
-
-    if (!isAuthorized) {
-        return <div>You are not authorized to view this event.</div>;
-    }
-
-    const uploadButtonText =
-        event.status === EventStatus.ALBUM_UPLOADED
-            ? "Replace the Album"
-            : "Upload the Album";
+    if (!event) return <div className="text-center text-lg text-gray-700">Loading...</div>;
+    if (!isAuthorized) return <div className="text-center text-lg text-red-600">You are not authorized to view this
+        event.</div>;
 
     return (
-        <div className="event-detail-container">
-            <h2 className="event-name">{event.name}</h2>
-            <p className="event-date">Date: {event.date}</p>
-            <p className="event-status">Status: {event.status}</p>
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="bg-white shadow-md rounded-lg overflow-hidden p-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">{event.name}</h2>
+                <div className="flex items-center text-sm text-gray-500 mb-4">
+                    <Calendar className="h-5 w-5 mr-2"/>
+                    <span>Date: {event.date}</span>
+                </div>
+                <p className="text-sm text-gray-600 mb-6">Status: {event.status}</p>
 
-            <div className="upload-section">
-                <br/>
-                <h3>{uploadButtonText}</h3>
-                <input
-                    type="file"
-                    name="album"
-                    accept=".zip"
-                    onChange={handleFileChange}
-                    className="file-input"
-                />
-            </div>
+                <div className="bg-gray-50 p-4 rounded-md mb-6">
+                    <h3 className="text-lg font-semibold mb-2">Upload or Replace the Album</h3>
+                    <input type="file" accept=".zip" onChange={handleFileChange}
+                           className="w-full border border-gray-300 rounded p-2 mb-4"/>
+                    <button onClick={handleUpload}
+                            className="w-full bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700 transition flex items-center justify-center">
+                        <Upload className="h-5 w-5 mr-2"/> Upload Album
+                    </button>
+                </div>
 
-            <button onClick={handleUpload} className="upload-button">
-                {uploadButtonText}
-            </button>
+                <div className="mb-6">
+                    <EventQRCode eventId={event.event_id}/>
+                </div>
 
-            <div className="qr-code-section">
-                <EventQRCode eventId={event.event_id}/>
-            </div>
-
-            <div className="guest-form-link">
-                <Link to={`/events/${event.event_id}/guest-form`}>
+                <Link to={`/events/${event.event_id}/guest-form`}
+                      className="block text-center bg-green-600 text-white p-3 rounded-md hover:bg-green-700 transition">
                     Fill out the Guest Submission Form
                 </Link>
             </div>

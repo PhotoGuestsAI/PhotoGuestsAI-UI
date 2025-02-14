@@ -1,38 +1,39 @@
 import React from "react";
 import {Link, useNavigate} from "react-router-dom";
-import '../styles/Navbar.css';  // Make sure to import the CSS file
+import {Home, Calendar, LogOut} from "lucide-react";
 
 const Navbar = () => {
     const navigate = useNavigate();
-
-    // Check if user is logged in by looking in localStorage
     const user = JSON.parse(localStorage.getItem("user"));
-    const isLoggedIn = user && user.email; // User is logged in if email exists in localStorage
+    const isLoggedIn = user && user.email;
 
     const handleSignOut = () => {
-        // Clear user data from localStorage and navigate to the home page
         localStorage.removeItem("user");
-        navigate("/"); // Redirect to the home page after signing out
+        navigate("/");
     };
 
     return (
-        <nav className="navbar">
-            <ul>
-                <li>
-                    <Link to="/">Home</Link>
-                </li>
-                {/* Show Events link if the user is logged in */}
-                {isLoggedIn && (
-                    <li>
-                        <Link to="/events">Events</Link>
-                    </li>
-                )}
-                {isLoggedIn ?
-                    <li>
-                        <button onClick={handleSignOut}>Sign Out</button>
-                    </li> : null
-                }
-            </ul>
+        <nav className="bg-white shadow-md sticky top-0 z-50">
+            <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
+                <Link to="/" className="text-2xl font-bold text-blue-600">
+                    PhotoGuestsAI
+                </Link>
+                <div className="flex space-x-4">
+                    <Link to="/" className="text-gray-700 hover:text-blue-600 flex items-center">
+                        <Home className="h-5 w-5 mr-1"/> Home
+                    </Link>
+                    {isLoggedIn && (
+                        <Link to="/events" className="text-gray-700 hover:text-blue-600 flex items-center">
+                            <Calendar className="h-5 w-5 mr-1"/> Events
+                        </Link>
+                    )}
+                    {isLoggedIn && (
+                        <button onClick={handleSignOut} className="text-gray-700 hover:text-blue-600 flex items-center">
+                            <LogOut className="h-5 w-5 mr-1"/> Sign Out
+                        </button>
+                    )}
+                </div>
+            </div>
         </nav>
     );
 };

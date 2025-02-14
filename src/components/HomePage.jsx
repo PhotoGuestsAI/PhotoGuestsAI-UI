@@ -1,85 +1,92 @@
-import React from 'react';
-import {useNavigate} from 'react-router-dom';
-import {GoogleLogin} from '@react-oauth/google';  // Import GoogleLogin for the login functionality
-import '../styles/HomePage.css';  // CSS styles for the homepage
+import {useNavigate} from "react-router-dom";
+import {motion} from "framer-motion";
+import {GoogleLogin} from "@react-oauth/google";
+import {Camera, Users, Calendar, ArrowRight} from "lucide-react";
+
+const fadeIn = {
+    hidden: {opacity: 0, y: 30},
+    visible: {opacity: 1, y: 0, transition: {duration: 0.8}},
+};
 
 const HomePage = () => {
     const navigate = useNavigate();
-    const user = JSON.parse(localStorage.getItem('user'));  // Check if user is logged in
+    const user = JSON.parse(localStorage.getItem("user"));
 
     const handleEventListNav = () => {
-        if (user) {
-            navigate('/events');  // Navigate to the event list page if logged in
-        } else {
-            // If the user is not logged in, handle login directly
-            alert("Please log in first to access the events.");
-        }
-    };
-
-    // Handle login success
-    const handleLoginSuccess = async (credentialResponse) => {
-        const {credential} = credentialResponse;
-
-        try {
-            const response = await fetch("http://127.0.0.1:8000/auth/verify-token", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({token: credential}),
-            });
-
-            if (!response.ok) {
-                throw new Error("Token verification failed");
-            }
-
-            const data = await response.json();
-            localStorage.setItem("user", JSON.stringify(data.user)); // Save user info in localStorage
-            navigate("/events"); // Redirect to events page after successful login
-        } catch (error) {
-            console.error("Error verifying Google token:", error);
-        }
+        if (user) navigate("/events");
+        else alert("Please log in first to access the events.");
     };
 
     return (
-        <div className="home-page-container">
-            <header className="home-page-header">
-                <h1>Welcome to PhotoGuestsAI!</h1>
-                <p>Your personal event management platform to handle photo albums and guest submissions.</p>
-            </header>
-
-            <section className="service-description">
-                <h2>What We Do</h2>
-                <p>
-                    We provide a simple and efficient way to create and manage events, upload event albums, and manage
-                    guest submissions with ease. Whether you're organizing a small gathering or a large event, we are
-                    here
-                    to help make your experience smoother.
+        <motion.div initial="hidden" animate="visible" exit="hidden">
+            {/* Gradient Header */}
+            <motion.header
+                className="py-20 sm:py-28 bg-gradient-to-b from-blue-700 to-blue-500 text-white text-center"
+                variants={fadeIn}
+            >
+                <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight">
+                    Welcome to <span className="text-yellow-300">PhotoGuestsAI</span>
+                </h1>
+                <p className="mt-6 text-xl text-blue-100 max-w-2xl mx-auto">
+                    AI-powered event management for seamless guest interactions and smart photo albums.
                 </p>
-            </section>
+            </motion.header>
 
-            <section className="cta-button">
-                {user ? (
-                    <button onClick={handleEventListNav} className="event-list-button">
-                        View My Events
-                    </button>
-                ) : (
-                    <GoogleLogin
-                        onSuccess={handleLoginSuccess}
-                        onError={() => console.error("Login Failed")}
-                        useOneTap
-                        render={(renderProps) => (
-                            <button
-                                onClick={renderProps.onClick}
-                                className="google-sign-in-btn"
-                                disabled={renderProps.disabled}
+            {/* Feature Cards */}
+            <motion.main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 mt-16">
+                <motion.div
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+                    variants={fadeIn}
+                >
+                    <FeatureCard icon={<Camera/>} title="Smart Photo Albums"
+                                 description="AI-powered event organization."/>
+                    <FeatureCard icon={<Users/>} title="Guest Management" description="Streamline guest interactions."/>
+                    <FeatureCard icon={<Calendar/>} title="Event Planning"
+                                 description="Plan and execute successful events."/>
+                </motion.div>
+
+                {/* CTA Section */}
+                <motion.div
+                    className="mt-20 bg-blue-900 text-white rounded-xl shadow-lg overflow-hidden p-12 text-center"
+                    variants={fadeIn}
+                >
+                    <h2 className="text-3xl font-extrabold">🚀 Ready to elevate your events?</h2>
+                    <p className="mt-4 text-lg text-blue-200">Join PhotoGuestsAI today and transform event
+                        management.</p>
+                    <div className="mt-8">
+                        {user ? (
+                            <motion.button
+                                onClick={handleEventListNav}
+                                className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-500 transition"
+                                whileHover={{scale: 1.05}}
                             >
-                                Login to Create Event
-                            </button>
+                                View My Events <ArrowRight className="ml-2 h-6 w-6"/>
+                            </motion.button>
+                        ) : (
+                            <GoogleLogin onSuccess={() => console.log("Logged in")}
+                                         onError={() => console.error("Login Failed")}/>
                         )}
-                    />
-                )}
-            </section>
-        </div>
+                    </div>
+                </motion.div>
+            </motion.main>
+        </motion.div>
     );
 };
+
+// Feature Card Component
+const FeatureCard = ({icon, title, description}) => (
+    <motion.div
+        className="bg-white/30 backdrop-blur-md shadow-lg border border-white/20 rounded-xl p-6"
+        whileHover={{scale: 1.05}}
+    >
+        <div className="flex items-center space-x-4">
+            <div className="bg-blue-500 text-white p-3 rounded-full">{icon}</div>
+            <div>
+                <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
+                <p className="mt-2 text-base text-gray-700">{description}</p>
+            </div>
+        </div>
+    </motion.div>
+);
 
 export default HomePage;
