@@ -23,7 +23,7 @@ const EventList = ({user}) => {
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const response = await axios.get("http://127.0.0.1:8000/events/", {
+                const response = await axios.get("http://50.19.49.233:8000//events/", {
                     headers: {Authorization: `Bearer ${user.token}`},
                 });
                 setEvents(response.data);

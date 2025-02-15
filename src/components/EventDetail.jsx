@@ -24,7 +24,7 @@ const EventDetail = () => {
 
     const fetchEventDetails = async () => {
         try {
-            const response = await axios.get(`http://127.0.0.1:8000/events/${eventId}`, {
+            const response = await axios.get(`http://50.19.49.233:8000//events/${eventId}`, {
                 headers: {Authorization: `Bearer ${user?.token}`},
             });
             setEvent(response.data);
@@ -51,7 +51,7 @@ const EventDetail = () => {
         formData.append("album", albumFile);
 
         try {
-            await axios.post(`http://127.0.0.1:8000/events/${eventId}/upload-event-album`, formData, {
+            await axios.post(`http://http://50.19.49.233:8000//events/${eventId}/upload-event-album`, formData, {
                 headers: {"Content-Type": "multipart/form-data", Authorization: `Bearer ${user?.token}`},
             });
             alert("File uploaded successfully!");

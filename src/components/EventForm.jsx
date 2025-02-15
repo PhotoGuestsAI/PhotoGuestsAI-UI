@@ -31,7 +31,7 @@ const EventForm = ({user, onEventCreated}) => {
         if (!validateForm()) return;
         setLoading(true);
         try {
-            const response = await axios.post("http://127.0.0.1:8000/events/", formData);
+            const response = await axios.post("http://50.19.49.233:8000//events/", formData);
             onEventCreated(response.data);
         } catch (err) {
             setError("Failed to create the event. Please try again.");
