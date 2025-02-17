@@ -51,7 +51,7 @@ const EventDetail = () => {
         formData.append("album", albumFile);
 
         try {
-            await axios.post(`http://http://50.19.49.233:8000/events/${eventId}/upload-event-album`, formData, {
+            await axios.post(`http://http://50.19.49.233:8000/albums/${eventId}/upload-event-album`, formData, {
                 headers: {"Content-Type": "multipart/form-data", Authorization: `Bearer ${user?.token}`},
             });
             alert("File uploaded successfully!");
