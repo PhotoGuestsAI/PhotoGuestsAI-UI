@@ -8,9 +8,29 @@ const fadeIn = {
     visible: {opacity: 1, y: 0, transition: {duration: 0.8}},
 };
 
-const HomePage = () => {
+const HomePage = ({user, setUser}) => {  // Accept `user` and `setUser` props from App.js
     const navigate = useNavigate();
-    const user = JSON.parse(localStorage.getItem("user"));
+
+    const handleLoginSuccess = async (credentialResponse) => {
+        const {credential} = credentialResponse;
+
+        try {
+            const response = await fetch("http://50.19.49.233:8000/auth/verify-token", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({token: credential}),
+            });
+
+            if (!response.ok) throw new Error("Token verification failed");
+
+            const data = await response.json();
+            const userWithToken = {...data.user, token: data.user.token};
+            setUser(userWithToken);
+            localStorage.setItem("user", JSON.stringify(userWithToken));
+        } catch (error) {
+            console.error("Error verifying Google token:", error);
+        }
+    };
 
     const handleEventListNav = () => {
         if (user) navigate("/events");
@@ -19,7 +39,6 @@ const HomePage = () => {
 
     return (
         <motion.div initial="hidden" animate="visible" exit="hidden">
-            {/* Gradient Header */}
             <motion.header
                 className="py-20 sm:py-28 bg-gradient-to-b from-blue-700 to-blue-500 text-white text-center"
                 variants={fadeIn}
@@ -32,7 +51,6 @@ const HomePage = () => {
                 </p>
             </motion.header>
 
-            {/* Feature Cards */}
             <motion.main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 mt-16">
                 <motion.div
                     className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
@@ -45,7 +63,6 @@ const HomePage = () => {
                                  description="Plan and execute successful events."/>
                 </motion.div>
 
-                {/* CTA Section */}
                 <motion.div
                     className="mt-20 bg-blue-900 text-white rounded-xl shadow-lg overflow-hidden p-12 text-center"
                     variants={fadeIn}
@@ -63,8 +80,7 @@ const HomePage = () => {
                                 View My Events <ArrowRight className="ml-2 h-6 w-6"/>
                             </motion.button>
                         ) : (
-                            <GoogleLogin onSuccess={() => console.log("Logged in")}
-                                         onError={() => console.error("Login Failed")}/>
+                            <GoogleLogin onSuccess={handleLoginSuccess} onError={() => console.error("Login Failed")}/>
                         )}
                     </div>
                 </motion.div>
@@ -73,7 +89,6 @@ const HomePage = () => {
     );
 };
 
-// Feature Card Component
 const FeatureCard = ({icon, title, description}) => (
     <motion.div
         className="bg-white/30 backdrop-blur-md shadow-lg border border-white/20 rounded-xl p-6"
