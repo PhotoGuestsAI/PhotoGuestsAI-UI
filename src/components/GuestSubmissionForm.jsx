@@ -43,7 +43,7 @@ const GuestSubmissionForm = () => {
         formData.append("photo", photo);
 
         try {
-            const response = await axios.post(`http://50.19.49.233:8000/events/${eventId}/submit-guest`, formData, {
+            const response = await axios.post(`http://50.19.49.233:8000/guests/${eventId}/submit-guest`, formData, {
                 headers: {"Content-Type": "multipart/form-data"},
             });
             setMessage(response.data.message);
