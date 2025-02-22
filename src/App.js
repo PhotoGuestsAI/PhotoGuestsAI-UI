@@ -34,7 +34,7 @@ const AppContent = ({user, setUser}) => {
 
     return (
         <>
-            <Navbar user={user} onLogout={handleLogout}/>
+            <Navbar user={user} setUser={setUser}/>
             <div className="container mx-auto px-4 py-8">
                 <AnimatePresence mode="wait">
                     <motion.div

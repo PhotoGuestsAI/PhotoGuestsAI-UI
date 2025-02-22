@@ -2,14 +2,20 @@ import {useNavigate} from "react-router-dom";
 import {motion} from "framer-motion";
 import {GoogleLogin} from "@react-oauth/google";
 import {Camera, Users, Calendar, ArrowRight} from "lucide-react";
+import {useEffect} from "react";
 
 const fadeIn = {
     hidden: {opacity: 0, y: 30},
     visible: {opacity: 1, y: 0, transition: {duration: 0.8}},
 };
 
-const HomePage = ({user, setUser}) => {  // Accept `user` and `setUser` props from App.js
+const HomePage = ({user, setUser}) => {
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const savedUser = JSON.parse(localStorage.getItem("user"));
+        setUser(savedUser);
+    }, []);
 
     const handleLoginSuccess = async (credentialResponse) => {
         const {credential} = credentialResponse;
@@ -52,10 +58,7 @@ const HomePage = ({user, setUser}) => {  // Accept `user` and `setUser` props fr
             </motion.header>
 
             <motion.main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 mt-16">
-                <motion.div
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
-                    variants={fadeIn}
-                >
+                <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" variants={fadeIn}>
                     <FeatureCard icon={<Camera/>} title="Smart Photo Albums"
                                  description="AI-powered event organization."/>
                     <FeatureCard icon={<Users/>} title="Guest Management" description="Streamline guest interactions."/>
@@ -68,8 +71,9 @@ const HomePage = ({user, setUser}) => {  // Accept `user` and `setUser` props fr
                     variants={fadeIn}
                 >
                     <h2 className="text-3xl font-extrabold">🚀 Ready to elevate your events?</h2>
-                    <p className="mt-4 text-lg text-blue-200">Join PhotoGuestsAI today and transform event
-                        management.</p>
+                    <p className="mt-4 text-lg text-blue-200">
+                        Join PhotoGuestsAI today and transform event management.
+                    </p>
                     <div className="mt-8">
                         {user ? (
                             <motion.button

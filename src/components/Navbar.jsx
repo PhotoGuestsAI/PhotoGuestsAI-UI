@@ -2,13 +2,12 @@ import React from "react";
 import {Link, useNavigate} from "react-router-dom";
 import {Home, Calendar, LogOut} from "lucide-react";
 
-const Navbar = () => {
+const Navbar = ({user, setUser}) => {
     const navigate = useNavigate();
-    const user = JSON.parse(localStorage.getItem("user"));
-    const isLoggedIn = user && user.email;
 
     const handleSignOut = () => {
         localStorage.removeItem("user");
+        setUser(null);
         navigate("/");
     };
 
@@ -22,15 +21,18 @@ const Navbar = () => {
                     <Link to="/" className="text-gray-700 hover:text-blue-600 flex items-center">
                         <Home className="h-5 w-5 mr-1"/> Home
                     </Link>
-                    {isLoggedIn && (
-                        <Link to="/events" className="text-gray-700 hover:text-blue-600 flex items-center">
-                            <Calendar className="h-5 w-5 mr-1"/> Events
-                        </Link>
-                    )}
-                    {isLoggedIn && (
-                        <button onClick={handleSignOut} className="text-gray-700 hover:text-blue-600 flex items-center">
-                            <LogOut className="h-5 w-5 mr-1"/> Sign Out
-                        </button>
+                    {user && (
+                        <>
+                            <Link to="/events" className="text-gray-700 hover:text-blue-600 flex items-center">
+                                <Calendar className="h-5 w-5 mr-1"/> Events
+                            </Link>
+                            <button
+                                onClick={handleSignOut}
+                                className="text-gray-700 hover:text-blue-600 flex items-center"
+                            >
+                                <LogOut className="h-5 w-5 mr-1"/> Sign Out
+                            </button>
+                        </>
                     )}
                 </div>
             </div>
