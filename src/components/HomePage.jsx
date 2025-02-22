@@ -21,7 +21,7 @@ const HomePage = ({user, setUser}) => {
         const {credential} = credentialResponse;
 
         try {
-            const response = await fetch("http://50.19.49.233/auth/verify-token", {
+            const response = await fetch("http://50.19.49.233:8000/auth/verify-token", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({token: credential}),
