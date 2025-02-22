@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import axios from "axios";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {motion} from "framer-motion";
 import EventForm from "./EventForm";
 import EventCard from "./EventCard";
@@ -19,10 +19,17 @@ const itemVariants = {
 const EventList = ({user}) => {
     const [events, setEvents] = useState([]);
     const [showForm, setShowForm] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
+        if (!user) {
+            navigate("/");
+            return;
+        }
+
         const fetchEvents = async () => {
             try {
+                // const response = await axios.get("http://127.0.0.1:8000/events/", {
                 const response = await axios.get("http://50.19.49.233:8000/events/", {
                     headers: {Authorization: `Bearer ${user.token}`},
                 });
@@ -31,14 +38,19 @@ const EventList = ({user}) => {
                 console.error("Error fetching events:", error);
             }
         };
-        if (user?.token) fetchEvents();
-    }, [user?.token]);
+
+        fetchEvents();
+    }, [user, navigate]);
+
+    if (!user) return null;
 
     return (
         <motion.div initial="hidden" animate="visible" exit="hidden">
             <div className="max-w-7xl mx-auto px-6 py-8">
                 <motion.div className="flex justify-between items-center mb-8" variants={itemVariants}>
-                    <h1 className="text-3xl font-bold text-gray-900">Welcome, {user.name}!</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">
+                        Welcome, {user?.name || "Guest"}!
+                    </h1>
                     <button
                         className={`${
                             showForm ? "bg-red-600 hover:bg-red-700" : "bg-blue-600 hover:bg-blue-700"
