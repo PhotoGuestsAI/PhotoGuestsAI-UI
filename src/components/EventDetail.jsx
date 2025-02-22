@@ -8,41 +8,46 @@ const EventDetail = () => {
     const [event, setEvent] = useState(null);
     const [albumFile, setAlbumFile] = useState(null);
     const [isAuthorized, setIsAuthorized] = useState(false);
+    const [user, setUser] = useState(null);
 
     const {eventId} = useParams();
     const navigate = useNavigate();
-    const user = JSON.parse(localStorage.getItem("user"));
-
-    const checkAuthorization = (eventEmail) => {
-        const userEmail = user?.email;
-        setIsAuthorized(userEmail === eventEmail);
-        if (userEmail !== eventEmail) {
-            alert("You are not authorized to view this event.");
-            navigate("/");
-        }
-    };
-
-    const fetchEventDetails = async () => {
-        try {
-            const response = await axios.get(`http://50.19.49.233:8000/events/${eventId}`, {
-                headers: {Authorization: `Bearer ${user?.token}`},
-            });
-            setEvent(response.data);
-            checkAuthorization(response.data.email);
-        } catch (error) {
-            console.error("Error fetching event details:", error);
-            alert("An error occurred while fetching event details.");
-        }
-    };
 
     useEffect(() => {
-        if (eventId && user?.token) {
-            fetchEventDetails();
-        }
-    }, [eventId, user?.token]); // Removed unnecessary dependencies
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        setUser(storedUser);
+    }, []);
 
+    useEffect(() => {
+        if (!eventId || !user?.token) return;
 
-    const handleFileChange = (e) => setAlbumFile(e.target.files[0]);
+        const fetchEventDetails = async () => {
+            try {
+                const response = await axios.get(`http://50.19.49.233:8000/events/${eventId}`, {
+                    headers: {Authorization: `Bearer ${user.token}`},
+                });
+                setEvent(response.data);
+
+                if (response.data.email !== user.email) {
+                    alert("You are not authorized to view this event.");
+                    navigate("/");
+                } else {
+                    setIsAuthorized(true);
+                }
+            } catch (error) {
+                console.error("Error fetching event details:", error);
+                alert("An error occurred while fetching event details.");
+            }
+        };
+
+        fetchEventDetails();
+    }, [eventId, user, navigate]);
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return alert("No file selected.");
+        setAlbumFile(file);
+    };
 
     const handleUpload = async () => {
         if (!albumFile) return alert("Please select a file before uploading.");
@@ -51,11 +56,14 @@ const EventDetail = () => {
         formData.append("album", albumFile);
 
         try {
-            await axios.post(`http://http://50.19.49.233:8000/albums/${eventId}/upload-event-album`, formData, {
-                headers: {"Content-Type": "multipart/form-data", Authorization: `Bearer ${user?.token}`},
+            await axios.post(`http://50.19.49.233/albums/${eventId}/upload-event-album`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${user?.token}`,
+                },
             });
             alert("File uploaded successfully!");
-            fetchEventDetails();
+            setAlbumFile(null);
         } catch (error) {
             console.error("Error uploading file:", error);
             alert("An error occurred while uploading the file.");
@@ -78,10 +86,16 @@ const EventDetail = () => {
 
                 <div className="bg-gray-50 p-4 rounded-md mb-6">
                     <h3 className="text-lg font-semibold mb-2">Upload or Replace the Album</h3>
-                    <input type="file" accept=".zip" onChange={handleFileChange}
-                           className="w-full border border-gray-300 rounded p-2 mb-4"/>
-                    <button onClick={handleUpload}
-                            className="w-full bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700 transition flex items-center justify-center">
+                    <input
+                        type="file"
+                        accept=".zip"
+                        onChange={handleFileChange}
+                        className="w-full border border-gray-300 rounded p-2 mb-4"
+                    />
+                    <button
+                        onClick={handleUpload}
+                        className="w-full bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700 transition flex items-center justify-center"
+                    >
                         <Upload className="h-5 w-5 mr-2"/> Upload Album
                     </button>
                 </div>
@@ -90,8 +104,10 @@ const EventDetail = () => {
                     <EventQRCode eventId={event.event_id}/>
                 </div>
 
-                <Link to={`/events/${event.event_id}/guest-form`}
-                      className="block text-center bg-green-600 text-white p-3 rounded-md hover:bg-green-700 transition">
+                <Link
+                    to={`/events/${event.event_id}/guest-form`}
+                    className="block text-center bg-green-600 text-white p-3 rounded-md hover:bg-green-700 transition"
+                >
                     Fill out the Guest Submission Form
                 </Link>
             </div>

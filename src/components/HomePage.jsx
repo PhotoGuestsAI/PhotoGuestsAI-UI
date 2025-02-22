@@ -14,14 +14,14 @@ const HomePage = ({user, setUser}) => {
 
     useEffect(() => {
         const savedUser = JSON.parse(localStorage.getItem("user"));
-        setUser(savedUser);
+        if (savedUser) setUser(savedUser);
     }, []);
 
     const handleLoginSuccess = async (credentialResponse) => {
         const {credential} = credentialResponse;
 
         try {
-            const response = await fetch("http://50.19.49.233:8000/auth/verify-token", {
+            const response = await fetch("http://127.0.0.1:8000/auth/verify-token", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({token: credential}),
@@ -31,8 +31,12 @@ const HomePage = ({user, setUser}) => {
 
             const data = await response.json();
             const userWithToken = {...data.user, token: data.user.token};
-            setUser(userWithToken);
+
             localStorage.setItem("user", JSON.stringify(userWithToken));
+            setUser(userWithToken);
+
+            // ✅ Force UI re-render by navigating to another route and back
+            navigate(0);
         } catch (error) {
             console.error("Error verifying Google token:", error);
         }
