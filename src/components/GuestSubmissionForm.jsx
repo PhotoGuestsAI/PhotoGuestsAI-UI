@@ -1,3 +1,5 @@
+import getBackendBaseUrl from "../utils/apiConfig";
+
 import React, {useState} from "react";
 import axios from "axios";
 import {useParams} from "react-router-dom";
@@ -43,7 +45,8 @@ const GuestSubmissionForm = () => {
         formData.append("photo", photo);
 
         try {
-            const response = await axios.post(`http://50.19.49.233:8000/guests/${eventId}/submit-guest`, formData, {
+            const API_BASE_URL = getBackendBaseUrl();
+            const response = await axios.post(`${API_BASE_URL}/guests/${eventId}/submit-guest`, formData, {
                 headers: {"Content-Type": "multipart/form-data"},
             });
             setMessage(response.data.message);

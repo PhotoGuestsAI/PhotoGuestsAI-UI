@@ -1,3 +1,5 @@
+import getBackendBaseUrl from "../utils/apiConfig";
+
 import {useNavigate} from "react-router-dom";
 import {motion} from "framer-motion";
 import {GoogleLogin} from "@react-oauth/google";
@@ -15,13 +17,14 @@ const HomePage = ({user, setUser}) => {
     useEffect(() => {
         const savedUser = JSON.parse(localStorage.getItem("user"));
         if (savedUser) setUser(savedUser);
-    }, []);
+    }, [setUser]);
 
     const handleLoginSuccess = async (credentialResponse) => {
         const {credential} = credentialResponse;
 
         try {
-            const response = await fetch("http://50.19.49.233:8000/auth/verify-token", {
+            const API_BASE_URL = getBackendBaseUrl();
+            const response = await fetch(`${API_BASE_URL}/auth/verify-token`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({token: credential}),

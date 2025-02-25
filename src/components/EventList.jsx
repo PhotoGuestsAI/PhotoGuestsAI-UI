@@ -1,3 +1,5 @@
+import getBackendBaseUrl from "../utils/apiConfig";
+
 import React, {useState, useEffect} from "react";
 import axios from "axios";
 import {Link, useNavigate} from "react-router-dom";
@@ -29,8 +31,8 @@ const EventList = ({user}) => {
 
         const fetchEvents = async () => {
             try {
-                // const response = await axios.get("http://127.0.0.1:8000/events/", {
-                const response = await axios.get("http://50.19.49.233:8000/events/", {
+                const API_BASE_URL = getBackendBaseUrl();
+                const response = await axios.get(`${API_BASE_URL}/events/`, {
                     headers: {Authorization: `Bearer ${user.token}`},
                 });
                 setEvents(response.data);

@@ -1,3 +1,5 @@
+import getBackendBaseUrl from "../utils/apiConfig";
+
 import {useState, useEffect} from "react";
 import axios from "axios";
 import {useParams, useNavigate, Link} from "react-router-dom";
@@ -23,7 +25,8 @@ const EventDetail = () => {
 
         const fetchEventDetails = async () => {
             try {
-                const response = await axios.get(`http://50.19.49.233:8000/events/${eventId}`, {
+                const API_BASE_URL = getBackendBaseUrl();
+                const response = await axios.get(`${API_BASE_URL}/events/${eventId}`, {
                     headers: {Authorization: `Bearer ${user.token}`},
                 });
                 setEvent(response.data);
@@ -56,7 +59,8 @@ const EventDetail = () => {
         formData.append("album", albumFile);
 
         try {
-            await axios.post(`http://50.19.49.233/albums/${eventId}/upload-event-album`, formData, {
+            const API_BASE_URL = getBackendBaseUrl();
+            await axios.post(`${API_BASE_URL}/albums/${eventId}/upload-event-album`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     Authorization: `Bearer ${user?.token}`,

@@ -1,3 +1,5 @@
+import getBackendBaseUrl from "../utils/apiConfig";
+
 import React, {useState} from "react";
 import axios from "axios";
 import {Calendar, Phone, User} from "lucide-react";
@@ -31,7 +33,8 @@ const EventForm = ({user, onEventCreated}) => {
         if (!validateForm()) return;
         setLoading(true);
         try {
-            const response = await axios.post("http://50.19.49.233:8000/events/", formData);
+            const API_BASE_URL = getBackendBaseUrl();
+            const response = await axios.post(`${API_BASE_URL}/events/`, formData);
             onEventCreated(response.data);
         } catch (err) {
             setError("Failed to create the event. Please try again.");
