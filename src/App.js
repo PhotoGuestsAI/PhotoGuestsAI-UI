@@ -14,6 +14,7 @@ import GuestSubmissionForm from "./components/GuestSubmissionForm";
 import Navbar from "./components/Navbar";
 import HomePage from "./components/HomePage";
 import "./index.css";
+import PersonalizedAlbum from "./components/PersonalizedAlbum";
 
 const pageVariants = {
     hidden: {opacity: 0, y: 20},
@@ -48,6 +49,8 @@ const AppContent = ({user, setUser}) => {
                             <Route path="/events" element={<EventList user={user}/>}/>
                             <Route path="/events/:eventId" element={<EventDetail/>}/>
                             <Route path="/events/:eventId/guest-form" element={<GuestSubmissionForm/>}/>
+                            <Route path="/albums/get-personalized-album/:event_id/:phone_number/:guest_uuid"
+                                   element={<PersonalizedAlbum user={user}/>}/>
                         </Routes>
                     </motion.div>
                 </AnimatePresence>
