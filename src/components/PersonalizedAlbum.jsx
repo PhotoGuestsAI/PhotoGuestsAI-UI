@@ -3,6 +3,7 @@ import {useParams} from "react-router-dom";
 import axios from "axios";
 import getBackendBaseUrl from "../utils/apiConfig";
 import {motion} from "framer-motion";
+import {X} from "lucide-react"; // Close button icon
 
 const listVariants = {
     hidden: {opacity: 0},
@@ -19,6 +20,7 @@ const PersonalizedAlbum = ({user}) => {
     const [photos, setPhotos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedPhoto, setSelectedPhoto] = useState(null); // State for full-size image
 
     useEffect(() => {
         if (!user) return;
@@ -66,8 +68,9 @@ const PersonalizedAlbum = ({user}) => {
                             <motion.div key={index} variants={itemVariants}>
                                 <img
                                     src={photo}
-                                    alt={`Personalized album ${index + 1}`}
-                                    className="w-full h-40 object-cover rounded-lg shadow-md"
+                                    alt={`Album ${index + 1}`}
+                                    className="w-full h-40 object-cover rounded-lg shadow-md cursor-pointer"
+                                    onClick={() => setSelectedPhoto(photo)} // Open modal on click
                                     onError={(e) => {
                                         e.target.src = "https://via.placeholder.com/150";
                                     }}
@@ -75,6 +78,30 @@ const PersonalizedAlbum = ({user}) => {
                             </motion.div>
                         ))}
                     </motion.div>
+                )}
+
+                {/* Full-size image modal */}
+                {selectedPhoto && (
+                    <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+                        <motion.div
+                            initial={{opacity: 0, scale: 0.8}}
+                            animate={{opacity: 1, scale: 1}}
+                            exit={{opacity: 0, scale: 0.8}}
+                            className="relative p-4"
+                        >
+                            <button
+                                className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-lg hover:bg-gray-200"
+                                onClick={() => setSelectedPhoto(null)}
+                            >
+                                <X className="h-6 w-6 text-black"/>
+                            </button>
+                            <img
+                                src={selectedPhoto}
+                                alt="Full-size"
+                                className="max-w-full max-h-[90vh] rounded-lg shadow-lg"
+                            />
+                        </motion.div>
+                    </div>
                 )}
             </div>
         </motion.div>
