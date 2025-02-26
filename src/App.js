@@ -3,7 +3,6 @@ import {
     BrowserRouter as Router,
     Routes,
     Route,
-    useNavigate,
     useLocation,
 } from "react-router-dom";
 import {GoogleOAuthProvider} from "@react-oauth/google";
@@ -23,16 +22,7 @@ const pageVariants = {
 };
 
 const AppContent = ({user, setUser}) => {
-    const navigate = useNavigate();
     const location = useLocation();
-
-    const handleLogout = () => {
-        localStorage.removeItem("user");
-        setUser(null);
-        navigate("/");
-    };
-
-
     return (
         <>
             <Navbar user={user} setUser={setUser}/>
