@@ -3,7 +3,7 @@ import {useParams} from "react-router-dom";
 import axios from "axios";
 import getBackendBaseUrl from "../utils/apiConfig";
 import {motion} from "framer-motion";
-import {X} from "lucide-react"; // Close button icon
+import {X} from "lucide-react";
 
 const listVariants = {
     hidden: {opacity: 0},
@@ -21,6 +21,7 @@ const PersonalizedAlbum = ({user}) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedPhoto, setSelectedPhoto] = useState(null); // State for full-size image
+    const [downloading, setDownloading] = useState(false); // State for download button
 
     useEffect(() => {
         if (!user) return;
@@ -47,6 +48,34 @@ const PersonalizedAlbum = ({user}) => {
         fetchPhotos();
     }, [event_id, phone_number, guest_uuid, user]);
 
+    const handleDownloadAlbum = async () => {
+        setDownloading(true);
+        try {
+            const API_BASE_URL = getBackendBaseUrl();
+            const response = await axios.get(
+                `${API_BASE_URL}/albums/get-personalized-album/${event_id}/${phone_number}/${guest_uuid}`,
+                {
+                    headers: {Authorization: `Bearer ${user.token}`},
+                    responseType: "blob", // Ensure the response is treated as a file
+                }
+            );
+
+            // Create a download link
+            const blob = new Blob([response.data], {type: "application/zip"});
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", `${guest_uuid}.zip`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (err) {
+            console.error("Error downloading album:", err);
+        } finally {
+            setDownloading(false);
+        }
+    };
+
     if (!user) return null;
     if (loading) return <p className="text-center text-lg">Loading album...</p>;
     if (error) return <p className="text-center text-red-500">{error}</p>;
@@ -56,6 +85,16 @@ const PersonalizedAlbum = ({user}) => {
             <div className="max-w-7xl mx-auto px-6 py-8">
                 <motion.div className="flex justify-between items-center mb-8" variants={itemVariants}>
                     <h1 className="text-3xl font-bold text-gray-900">Your Personalized Album</h1>
+
+                    {/* Download Album Button */}
+                    <button
+                        onClick={handleDownloadAlbum}
+                        className={`px-6 py-2 text-white rounded-md flex items-center 
+                            ${downloading ? "bg-gray-500 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+                        disabled={downloading}
+                    >
+                        {downloading ? "Downloading..." : "Download Album"}
+                    </button>
                 </motion.div>
 
                 {photos.length === 0 ? (
