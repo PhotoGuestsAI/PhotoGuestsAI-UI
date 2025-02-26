@@ -66,7 +66,7 @@ const PersonalizedAlbum = ({user}) => {
                             <motion.div key={index} variants={itemVariants}>
                                 <img
                                     src={photo}
-                                    alt={`Album Photo ${index + 1}`}
+                                    alt={`Personalized album ${index + 1}`}
                                     className="w-full h-40 object-cover rounded-lg shadow-md"
                                     onError={(e) => {
                                         e.target.src = "https://via.placeholder.com/150";
