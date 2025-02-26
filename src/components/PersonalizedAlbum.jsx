@@ -15,25 +15,21 @@ const itemVariants = {
     visible: {opacity: 1, y: 0},
 };
 
-const PersonalizedAlbum = ({user}) => {
+const PersonalizedAlbum = () => {
     const {event_id, phone_number, guest_uuid} = useParams();
     const [photos, setPhotos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedPhoto, setSelectedPhoto] = useState(null); // State for full-size image
-    const [downloading, setDownloading] = useState(false); // State for download button
+    const [downloading, setDownloading] = useState(false);
 
     useEffect(() => {
-        if (!user) return;
 
         const fetchPhotos = async () => {
             try {
                 const API_BASE_URL = getBackendBaseUrl();
                 const response = await axios.get(
                     `${API_BASE_URL}/albums/get-personalized-album-photos/${event_id}/${phone_number}/${guest_uuid}`,
-                    {
-                        headers: {Authorization: `Bearer ${user.token}`},
-                    }
                 );
 
                 setPhotos(response.data.photos || []);
@@ -46,7 +42,7 @@ const PersonalizedAlbum = ({user}) => {
         };
 
         fetchPhotos();
-    }, [event_id, phone_number, guest_uuid, user]);
+    }, [event_id, phone_number, guest_uuid]);
 
     const handleDownloadAlbum = async () => {
         setDownloading(true);
@@ -55,7 +51,6 @@ const PersonalizedAlbum = ({user}) => {
             const response = await axios.get(
                 `${API_BASE_URL}/albums/get-personalized-album/${event_id}/${phone_number}/${guest_uuid}`,
                 {
-                    headers: {Authorization: `Bearer ${user.token}`},
                     responseType: "blob", // Ensure the response is treated as a file
                 }
             );
@@ -76,7 +71,6 @@ const PersonalizedAlbum = ({user}) => {
         }
     };
 
-    if (!user) return null;
     if (loading) return <p className="text-center text-lg">Loading album...</p>;
     if (error) return <p className="text-center text-red-500">{error}</p>;
 

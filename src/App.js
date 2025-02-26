@@ -40,7 +40,7 @@ const AppContent = ({user, setUser}) => {
                             <Route path="/events/:eventId" element={<EventDetail/>}/>
                             <Route path="/events/:eventId/guest-form" element={<GuestSubmissionForm/>}/>
                             <Route path="/albums/get-personalized-album/:event_id/:phone_number/:guest_uuid"
-                                   element={<PersonalizedAlbum user={user}/>}/>
+                                   element={<PersonalizedAlbum/>}/>
                         </Routes>
                     </motion.div>
                 </AnimatePresence>
