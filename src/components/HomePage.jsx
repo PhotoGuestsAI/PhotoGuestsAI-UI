@@ -17,7 +17,7 @@ const HomePage = ({user, setUser}) => {
     useEffect(() => {
         const savedUser = JSON.parse(localStorage.getItem("user"));
         if (savedUser) setUser(savedUser);
-    }, [setUser, user]);
+    }, []);
 
     const handleLoginSuccess = async (credentialResponse) => {
         const {credential} = credentialResponse;
