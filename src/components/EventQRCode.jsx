@@ -1,7 +1,9 @@
 import {QRCodeCanvas} from "qrcode.react";
+import getBackendBaseUrl from "../utils/apiConfig";
 
 const EventQRCode = ({eventId}) => {
-    const eventFormUrl = `http://localhost:3000/guest-form/${eventId}`;
+    const API_BASE_URL = getBackendBaseUrl();
+    const eventFormUrl = `${API_BASE_URL}/guest-form/${eventId}`;
 
     return (
         <div className="text-center bg-white/30 backdrop-blur-md shadow-lg border border-white/20 rounded-xl p-6">
