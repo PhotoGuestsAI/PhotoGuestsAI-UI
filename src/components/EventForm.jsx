@@ -1,8 +1,7 @@
-import getBackendBaseUrl from "../utils/apiConfig";
-
 import React, {useState} from "react";
 import axios from "axios";
 import {Calendar, Phone, User} from "lucide-react";
+import getBackendBaseUrl from "../utils/apiConfig";
 
 const EventForm = ({user, onEventCreated}) => {
     const [formData, setFormData] = useState({
@@ -15,6 +14,7 @@ const EventForm = ({user, onEventCreated}) => {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
     const [validationError, setValidationError] = useState("");
 
     const validateForm = () => {
@@ -32,10 +32,33 @@ const EventForm = ({user, onEventCreated}) => {
         e.preventDefault();
         if (!validateForm()) return;
         setLoading(true);
+        setError("");
+        setSuccessMessage("");
+
         try {
             const API_BASE_URL = getBackendBaseUrl();
-            const response = await axios.post(`${API_BASE_URL}/events/`, formData);
-            onEventCreated(response.data);
+            const token = user?.token;
+            if (!token) {
+                setError("Authentication required. Please log in again.");
+                return;
+            }
+
+            await axios.post(
+                `${API_BASE_URL}/events/`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            setSuccessMessage("Event created successfully!");
+            setFormData({name: "", date: "", phone: "", username: user.name, email: user.email});
+
+            // Refresh the event list
+            onEventCreated();
         } catch (err) {
             setError("Failed to create the event. Please try again.");
         } finally {
@@ -48,6 +71,7 @@ const EventForm = ({user, onEventCreated}) => {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Create a New Event</h2>
             {validationError && <p className="text-red-500 mb-4">{validationError}</p>}
             {error && <p className="text-red-500 mb-4">{error}</p>}
+            {successMessage && <p className="text-green-600 mb-4">{successMessage}</p>}
             <form onSubmit={handleSubmit} className="space-y-4">
                 <InputField icon={<User/>} name="name" value={formData.name} onChange={handleInputChange}
                             placeholder="Enter event name"/>
