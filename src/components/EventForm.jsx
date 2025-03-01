@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import axios from "axios";
 import {Calendar, Phone, User} from "lucide-react";
-import getBackendBaseUrl from "../utils/apiConfig";
+import {getBackendBaseUrl, getVipUsers} from "../utils/apiConfig";
 
 const EventForm = ({user, onEventCreated}) => {
     const [formData, setFormData] = useState({
@@ -45,9 +45,27 @@ const EventForm = ({user, onEventCreated}) => {
             }
 
             const dataWithToken = {
-            ...formData,
-            token: token
-        };
+                ...formData,
+                token: token
+            };
+
+            // 🔥 Skip payment for a specific user (e.g., an admin or test account)
+            const VIP_USERS = getVipUsers();
+            if (VIP_USERS.includes(user.email)) {
+                // Directly create event without payment
+                const eventResponse = await axios.post(`${API_BASE_URL}/events/`, dataWithToken, {
+                    headers: {Authorization: `Bearer ${token}`},
+                });
+
+                if (eventResponse.status === 200) {
+                    setSuccessMessage("Event created successfully!");
+                    setFormData({name: "", date: "", phone: "", username: user.name, email: user.email});
+                    onEventCreated();
+                    return;
+                } else {
+                    throw new Error("Failed to create event.");
+                }
+            }
 
             // Step 1: Request a PayPal payment approval URL
             const paymentResponse = await axios.post(`${API_BASE_URL}/payment/create-payment`, dataWithToken, {

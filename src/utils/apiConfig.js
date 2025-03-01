@@ -4,4 +4,9 @@ const getBackendBaseUrl = () => {
         : process.env.REACT_APP_BACKEND_PROD_HOST;
 };
 
-export default getBackendBaseUrl;
+const getVipUsers = () => {
+    const vipUsers = process.env.REACT_APP_VIP_USERS || "";
+    return vipUsers.split(",").map(email => email.trim());
+};
+
+export {getBackendBaseUrl, getVipUsers};

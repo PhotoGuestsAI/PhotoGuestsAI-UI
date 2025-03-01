@@ -1,4 +1,4 @@
-import getBackendBaseUrl from "../utils/apiConfig";
+import {getBackendBaseUrl} from "../utils/apiConfig";
 
 import React, {useState} from "react";
 import axios from "axios";

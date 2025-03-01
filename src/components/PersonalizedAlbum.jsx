@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import {useParams} from "react-router-dom";
 import axios from "axios";
-import getBackendBaseUrl from "../utils/apiConfig";
+import {getBackendBaseUrl} from "../utils/apiConfig";
 import {motion} from "framer-motion";
 import {X} from "lucide-react";
 

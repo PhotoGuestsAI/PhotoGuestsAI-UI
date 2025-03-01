@@ -1,5 +1,5 @@
 import {QRCodeCanvas} from "qrcode.react";
-import getBackendBaseUrl from "../utils/apiConfig";
+import {getBackendBaseUrl} from "../utils/apiConfig";
 
 const EventQRCode = ({eventId}) => {
     const API_BASE_URL = getBackendBaseUrl();
