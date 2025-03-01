@@ -7,9 +7,22 @@ services:
     ports:
       - "80:80"
     restart: always
+    depends_on:
+      - backend  #  ^|^e Ensures backend starts first
     networks:
-      - frontend-network
+      - app-network  #  ^|^e Use shared network
+
+  backend:
+    build: ../PhotoGuestsAI-Backend  #  ^|^e Correct path to backend
+    container_name: fastapi-backend
+    restart: always
+    environment:
+      - ENV=production
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network  #  ^|^e Use shared network
 
 networks:
-  frontend-network:
+  app-network: #  ^|^e Docker will create this network automatically
     driver: bridge
