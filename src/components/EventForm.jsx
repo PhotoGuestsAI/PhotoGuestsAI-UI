@@ -78,19 +78,6 @@ const EventForm = ({user, onEventCreated}) => {
         const timeout = setTimeout(() => {
             const {num_guests, num_images} = formData;
 
-            if (num_guests < 10 || num_guests > 1000) {
-                setValidationError("Guests must be between 10 and 1000.");
-                setPrice(0);
-                return;
-            }
-            if (num_images < 100 || num_images > 10000) {
-                setValidationError("Images must be between 100 and 10,000.");
-                setPrice(0);
-                return;
-            }
-
-            setValidationError("");
-
             if (num_guests && num_images) {
                 const tier = pricingTiers.find(t => t.guests >= num_guests && t.images >= num_images);
                 setPrice(tier ? tier.price : 0);
