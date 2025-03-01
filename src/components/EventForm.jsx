@@ -1,6 +1,8 @@
 import React, {useState} from "react";
 import axios from "axios";
 import {Calendar, Phone, User} from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import {getBackendBaseUrl, getVipUsers} from "../utils/apiConfig";
 
 const EventForm = ({user, onEventCreated}) => {
@@ -28,6 +30,10 @@ const EventForm = ({user, onEventCreated}) => {
 
     const handleInputChange = (e) => setFormData({...formData, [e.target.name]: e.target.value});
 
+    const handleDateChange = (date) => {
+        setFormData({...formData, date: date ? date.toISOString().split('T')[0] : ""});
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validateForm()) return;
@@ -49,10 +55,8 @@ const EventForm = ({user, onEventCreated}) => {
                 token: token
             };
 
-            // 🔥 Skip payment for a specific user (e.g., an admin or test account)
             const VIP_USERS = getVipUsers();
             if (VIP_USERS.includes(user.email)) {
-                // Directly create event without payment
                 const eventResponse = await axios.post(`${API_BASE_URL}/events/`, dataWithToken, {
                     headers: {Authorization: `Bearer ${token}`},
                 });
@@ -67,13 +71,11 @@ const EventForm = ({user, onEventCreated}) => {
                 }
             }
 
-            // Step 1: Request a PayPal payment approval URL
             const paymentResponse = await axios.post(`${API_BASE_URL}/payment/create-payment`, dataWithToken, {
                 headers: {Authorization: `Bearer ${token}`},
             });
 
             if (paymentResponse.data.approval_url) {
-                // Step 2: Redirect user to PayPal payment page
                 window.location.href = paymentResponse.data.approval_url;
             } else {
                 throw new Error("Failed to create PayPal payment.");
@@ -95,8 +97,7 @@ const EventForm = ({user, onEventCreated}) => {
             <form onSubmit={handleSubmit} className="space-y-4">
                 <InputField icon={<User/>} name="name" value={formData.name} onChange={handleInputChange}
                             placeholder="Enter event name"/>
-                <InputField icon={<Calendar/>} name="date" value={formData.date} onChange={handleInputChange}
-                            type="date"/>
+                <DateInputField icon={<Calendar/>} name="date" value={formData.date} onChange={handleDateChange}/>
                 <InputField icon={<Phone/>} name="phone" value={formData.phone} onChange={handleInputChange}
                             placeholder="Enter phone number"/>
                 <button type="submit"
@@ -115,6 +116,19 @@ const InputField = ({icon, ...props}) => (
         <input {...props}
                className="flex-1 bg-transparent border-none outline-none ml-3 text-gray-900 placeholder-gray-500"
                required/>
+    </div>
+);
+
+const DateInputField = ({icon, name, value, onChange}) => (
+    <div className="flex items-center bg-gray-100 border rounded-md p-3">
+        {icon}
+        <DatePicker
+            selected={value ? new Date(value) : null}
+            onChange={onChange}
+            dateFormat="yyyy-MM-dd"
+            className="flex-1 bg-transparent border-none outline-none ml-3 text-gray-900 placeholder-gray-500"
+            required
+        />
     </div>
 );
 
