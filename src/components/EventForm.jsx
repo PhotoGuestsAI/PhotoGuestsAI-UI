@@ -40,27 +40,29 @@ const EventForm = ({user, onEventCreated}) => {
             const token = user?.token;
             if (!token) {
                 setError("Authentication required. Please log in again.");
+                setLoading(false);
                 return;
             }
 
-            await axios.post(
-                `${API_BASE_URL}/events/`,
-                formData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
+            const dataWithToken = {
+            ...formData,
+            token: token
+        };
 
-            setSuccessMessage("Event created successfully!");
-            setFormData({name: "", date: "", phone: "", username: user.name, email: user.email});
+            // Step 1: Request a PayPal payment approval URL
+            const paymentResponse = await axios.post(`${API_BASE_URL}/payment/create-payment`, dataWithToken, {
+                headers: {Authorization: `Bearer ${token}`},
+            });
 
-            // Refresh the event list
-            onEventCreated();
+            if (paymentResponse.data.approval_url) {
+                // Step 2: Redirect user to PayPal payment page
+                window.location.href = paymentResponse.data.approval_url;
+            } else {
+                throw new Error("Failed to create PayPal payment.");
+            }
         } catch (err) {
-            setError("Failed to create the event. Please try again.");
+            setError("Failed to process payment. Please try again.");
+            console.error(err);
         } finally {
             setLoading(false);
         }
