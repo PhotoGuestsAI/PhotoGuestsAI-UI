@@ -2,6 +2,7 @@ import React from "react";
 import {Link, useNavigate} from "react-router-dom";
 import {Home, Calendar, LogOut, LogIn} from "lucide-react";
 import {GoogleLogin} from "@react-oauth/google";
+import {getBackendBaseUrl} from "../utils/apiConfig";
 
 const Navbar = ({user, setUser}) => {
     const navigate = useNavigate();
@@ -12,20 +13,27 @@ const Navbar = ({user, setUser}) => {
         navigate("/");
     };
 
-    const handleLoginSuccess = (response) => {
-        const userInfo = {
-            name: response.profileObj?.name,
-            email: response.profileObj?.email,
-            picture: response.profileObj?.imageUrl,
-            token: response.credential,
-        };
+    const handleLoginSuccess = async (credentialResponse) => {
+        const {credential} = credentialResponse;
 
-        localStorage.setItem("user", JSON.stringify(userInfo));
-        setUser(userInfo);
-    };
+        try {
+            const API_BASE_URL = getBackendBaseUrl();
+            const response = await fetch(`${API_BASE_URL}/auth/verify-token`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({token: credential}),
+            });
 
-    const handleLoginFailure = (error) => {
-        console.error("Google Login Failed:", error);
+            if (!response.ok) throw new Error("Token verification failed");
+
+            const data = await response.json();
+            const userWithToken = {...data.user, token: data.user.token};
+
+            localStorage.setItem("user", JSON.stringify(userWithToken));
+            setUser(userWithToken);
+        } catch (error) {
+            console.error("Error verifying Google token:", error);
+        }
     };
 
     return (
@@ -53,11 +61,7 @@ const Navbar = ({user, setUser}) => {
                     ) : (
                         <div className="flex items-center space-x-2">
                             <LogIn className="h-5 w-5 text-gray-700"/>
-                            <GoogleLogin
-                                onSuccess={handleLoginSuccess}
-                                onError={handleLoginFailure}
-                                useOneTap
-                            />
+                            <GoogleLogin onSuccess={handleLoginSuccess} onError={() => console.error("Login Failed")}/>
                         </div>
                     )}
                 </div>
