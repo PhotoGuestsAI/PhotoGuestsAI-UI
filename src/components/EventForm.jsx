@@ -38,6 +38,7 @@ const EventForm = ({user, onEventCreated}) => {
     const [price, setPrice] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
     const [validationError, setValidationError] = useState("");
     const [typingTimeout, setTypingTimeout] = useState(null);
 
@@ -58,7 +59,6 @@ const EventForm = ({user, onEventCreated}) => {
 
     const handleInputChange = (e) => {
         const {name, value} = e.target;
-
         setFormData((prev) => ({
             ...prev,
             [name]: (name === "num_guests" || name === "num_images")
@@ -73,12 +73,11 @@ const EventForm = ({user, onEventCreated}) => {
 
     // Auto-update price when num_guests or num_images change
     useEffect(() => {
-        if (typingTimeout) clearTimeout(typingTimeout); // Clear previous timeout
+        if (typingTimeout) clearTimeout(typingTimeout);
 
         const timeout = setTimeout(() => {
             const {num_guests, num_images} = formData;
 
-            // Validate ranges before calculating price
             if (num_guests < 10 || num_guests > 1000) {
                 setValidationError("Guests must be between 10 and 1000.");
                 setPrice(0);
@@ -106,6 +105,7 @@ const EventForm = ({user, onEventCreated}) => {
         if (!validateForm()) return;
         setLoading(true);
         setError("");
+        setSuccessMessage("");
 
         try {
             const API_BASE_URL = getBackendBaseUrl();
@@ -116,24 +116,22 @@ const EventForm = ({user, onEventCreated}) => {
                 return;
             }
 
-            // Prepare event data with token
-            const dataWithToken = {...formData, price, token: token};
+            const dataWithToken = {...formData, price, token};
 
-            // Check if user is a VIP
             const VIP_USERS = getVipUsers();
             if (VIP_USERS.includes(user.email)) {
-                // VIP users create an event directly (skip payment)
                 const eventResponse = await axios.post(`${API_BASE_URL}/events/`, dataWithToken, {
                     headers: {Authorization: `Bearer ${token}`},
                 });
 
                 if (eventResponse.status === 200) {
+                    setSuccessMessage("🎉 Event created successfully!");
                     setFormData({
                         name: "",
                         date: "",
                         phone: "",
-                        num_guests: user.num_guests,
-                        num_images: user.num_images,
+                        num_guests: "",
+                        num_images: "",
                         username: user.name,
                         email: user.email
                     });
@@ -144,8 +142,7 @@ const EventForm = ({user, onEventCreated}) => {
                 }
             }
 
-            // Non-VIP users proceed with payment
-            const paymentResponse = await axios.post(`${API_BASE_URL}/payment/create-payment`, {...formData, price}, {
+            const paymentResponse = await axios.post(`${API_BASE_URL}/payment/create-payment`, dataWithToken, {
                 headers: {Authorization: `Bearer ${token}`},
             });
 
@@ -162,12 +159,13 @@ const EventForm = ({user, onEventCreated}) => {
         }
     };
 
-
     return (
         <div className="bg-white/30 backdrop-blur-md shadow-lg border border-white/20 rounded-xl p-6 max-w-md mx-auto">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Create a New Event</h2>
             {validationError && <p className="text-red-500 mb-4">{validationError}</p>}
             {error && <p className="text-red-500 mb-4">{error}</p>}
+            {successMessage &&
+                <p className="text-green-600 mb-4">{successMessage}</p>}
             <form onSubmit={handleSubmit} className="space-y-4">
                 <InputField icon={<User/>} name="name" value={formData.name} onChange={handleInputChange}
                             placeholder="Enter event name"/>
