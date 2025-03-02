@@ -34,3 +34,10 @@ else
     # Stop Green
     docker-compose stop backend-green frontend-green
 fi
+
+
+# ✅ Ensure Nginx is running at the end
+echo "Ensuring Nginx is running..."
+sudo systemctl enable nginx
+sudo systemctl restart nginx
+echo "Nginx is running!"
