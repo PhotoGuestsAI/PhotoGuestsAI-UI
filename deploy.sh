@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# Pull latest images
-docker pull my-dockerhub-user/my-backend:latest
-docker pull my-dockerhub-user/my-frontend:latest
+echo "Building backend and frontend images..."
+docker-compose build --no-cache backend-blue backend-green frontend-blue frontend-green
 
 # Determine which version is currently active
 ACTIVE_BACKEND=$(docker ps --format "{{.Names}}" | grep fastapi-backend-blue || true)
