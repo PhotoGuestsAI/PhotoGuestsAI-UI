@@ -1,38 +1,36 @@
 #!/bin/bash
 
-# Function to get active backend
-get_active_backend() {
-    if docker ps --format "{{.Names}}" | grep -q "fastapi-backend-blue"; then
+# Function to get active frontend
+get_active_frontend() {
+    if docker ps --format "{{.Names}}" | grep -q "react-frontend-blue"; then
         echo "blue"
     else
         echo "green"
     fi
 }
 
-ACTIVE_BACKEND=$(get_active_backend)
+ACTIVE_FRONTEND=$(get_active_frontend)
 
-if [ "$ACTIVE_BACKEND" == "blue" ]; then
-    echo "Deploying to Green..."
-    docker-compose up -d backend-green frontend-green
+if [ "$ACTIVE_FRONTEND" == "blue" ]; then
+    echo "Deploying Frontend to Green..."
+    docker-compose up -d frontend-green
     sleep 5  # Allow time for startup
 
-    # Update Nginx to use Green servers
-    sudo sed -i 's/server 127.0.0.1:8000/server 127.0.0.1:8001/' /etc/nginx/conf.d/photoguests.conf
-    sudo sed -i 's/server 127.0.0.1:3000/server 127.0.0.1:3001/' /etc/nginx/conf.d/photoguests.conf
+    # Update Nginx to use Green frontend
+    sudo sed -i 's/react-frontend-blue/react-frontend-green/' /etc/nginx/conf.d/photoguests.conf
     sudo systemctl restart nginx
 
-    # Stop Blue
-    docker-compose stop backend-blue frontend-blue
+    # Stop Blue Frontend
+    docker-compose stop frontend-blue
 else
-    echo "Deploying to Blue..."
-    docker-compose up -d backend-blue frontend-blue
+    echo "Deploying Frontend to Blue..."
+    docker-compose up -d frontend-blue
     sleep 5  # Allow time for startup
 
-    # Update Nginx to use Blue servers
-    sudo sed -i 's/server 127.0.0.1:8001/server 127.0.0.1:8000/' /etc/nginx/conf.d/photoguests.conf
-    sudo sed -i 's/server 127.0.0.1:3001/server 127.0.0.1:3000/' /etc/nginx/conf.d/photoguests.conf
+    # Update Nginx to use Blue frontend
+    sudo sed -i 's/react-frontend-green/react-frontend-blue/' /etc/nginx/conf.d/photoguests.conf
     sudo systemctl restart nginx
 
-    # Stop Green
-    docker-compose stop backend-green frontend-green
+    # Stop Green Frontend
+    docker-compose stop frontend-green
 fi
