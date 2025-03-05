@@ -3,7 +3,7 @@ import {useState, useEffect} from "react";
 import axios from "axios";
 import {useParams, useNavigate, Link} from "react-router-dom";
 import EventQRCode from "./EventQRCode";
-import {Calendar, Upload, FileText} from "lucide-react";
+import {Calendar, Upload} from "lucide-react";
 
 const EventDetail = () => {
     const [event, setEvent] = useState(null);
