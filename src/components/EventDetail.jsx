@@ -1,5 +1,4 @@
 import {getBackendBaseUrl} from "../utils/apiConfig";
-
 import {useState, useEffect} from "react";
 import axios from "axios";
 import {useParams, useNavigate, Link} from "react-router-dom";
@@ -32,14 +31,14 @@ const EventDetail = () => {
                 setEvent(response.data);
 
                 if (response.data.email !== user.email) {
-                    alert("You are not authorized to view this event.");
+                    alert("אינך מורשה לצפות באירוע זה.");
                     navigate("/");
                 } else {
                     setIsAuthorized(true);
                 }
             } catch (error) {
                 console.error("Error fetching event details:", error);
-                alert("An error occurred while fetching event details.");
+                alert("אירעה שגיאה בעת קבלת פרטי האירוע.");
             }
         };
 
@@ -48,12 +47,12 @@ const EventDetail = () => {
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        if (!file) return alert("No file selected.");
+        if (!file) return alert("לא נבחר קובץ.");
         setAlbumFile(file);
     };
 
     const handleUpload = async () => {
-        if (!albumFile) return alert("Please select a file before uploading.");
+        if (!albumFile) return alert("אנא בחר קובץ לפני ההעלאה.");
 
         const formData = new FormData();
         formData.append("album", albumFile);
@@ -66,30 +65,29 @@ const EventDetail = () => {
                     Authorization: `Bearer ${user?.token}`,
                 },
             });
-            alert("File uploaded successfully!");
+            alert("הקובץ הועלה בהצלחה!");
             setAlbumFile(null);
         } catch (error) {
             console.error("Error uploading file:", error);
-            alert("An error occurred while uploading the file.");
+            alert("אירעה שגיאה בעת העלאת הקובץ.");
         }
     };
 
-    if (!event) return <div className="text-center text-lg text-gray-700">Loading...</div>;
-    if (!isAuthorized) return <div className="text-center text-lg text-red-600">You are not authorized to view this
-        event.</div>;
+    if (!event) return <div className="text-center text-lg text-gray-700">טוען...</div>;
+    if (!isAuthorized) return <div className="text-center text-lg text-red-600">אין לך הרשאה לצפות באירוע זה.</div>;
 
     return (
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="rtl"> {/* RTL Layout */}
             <div className="bg-white shadow-md rounded-lg overflow-hidden p-6">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">{event.name}</h2>
                 <div className="flex items-center text-sm text-gray-500 mb-4">
-                    <Calendar className="h-5 w-5 mr-2"/>
-                    <span>Date: {event.date}</span>
+                    <Calendar className="h-5 w-5 ml-2"/>
+                    <span>תאריך: {event.date}</span>
                 </div>
-                <p className="text-sm text-gray-600 mb-6">Status: {event.status}</p>
+                <p className="text-sm text-gray-600 mb-6">סטטוס: {event.status}</p>
 
                 <div className="bg-gray-50 p-4 rounded-md mb-6">
-                    <h3 className="text-lg font-semibold mb-2">Upload or Replace the Album</h3>
+                    <h3 className="text-lg font-semibold mb-2">העלה או החלף את האלבום</h3>
                     <input
                         type="file"
                         accept=".zip"
@@ -100,7 +98,7 @@ const EventDetail = () => {
                         onClick={handleUpload}
                         className="w-full bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700 transition flex items-center justify-center"
                     >
-                        <Upload className="h-5 w-5 mr-2"/> Upload Album
+                        <Upload className="h-5 w-5 ml-2"/> העלאת אלבום
                     </button>
                 </div>
 
@@ -112,7 +110,7 @@ const EventDetail = () => {
                     to={`/events/${event.event_id}/guest-form`}
                     className="block text-center bg-green-600 text-white p-3 rounded-md hover:bg-green-700 transition"
                 >
-                    Fill out the Guest Submission Form
+                    מילוי טופס רישום אורחים
                 </Link>
             </div>
         </div>

@@ -46,11 +46,11 @@ const EventForm = ({user, onEventCreated}) => {
         const {num_guests, num_images} = formData;
 
         if (!num_guests || isNaN(num_guests) || num_guests < 10 || num_guests > 1000) {
-            setValidationError("Guests must be between 10 and 1000.");
+            setValidationError("מספר האורחים חייב להיות בין 10 ל-1000.");
             return false;
         }
         if (!num_images || isNaN(num_images) || num_images < 100 || num_images > 10000) {
-            setValidationError("Images must be between 100 and 10,000.");
+            setValidationError("מספר התמונות חייב להיות בין 100 ל-10,000.");
             return false;
         }
         setValidationError("");
@@ -71,7 +71,6 @@ const EventForm = ({user, onEventCreated}) => {
         setFormData({...formData, date: date ? date.toISOString().split('T')[0] : ""});
     };
 
-    // Auto-update price when num_guests or num_images change
     useEffect(() => {
         if (typingTimeout) clearTimeout(typingTimeout);
 
@@ -98,7 +97,7 @@ const EventForm = ({user, onEventCreated}) => {
             const API_BASE_URL = getBackendBaseUrl();
             const token = user?.token;
             if (!token) {
-                setError("Authentication required. Please log in again.");
+                setError("נדרש אימות. אנא התחבר מחדש.");
                 setLoading(false);
                 return;
             }
@@ -112,7 +111,7 @@ const EventForm = ({user, onEventCreated}) => {
                 });
 
                 if (eventResponse.status === 200) {
-                    setSuccessMessage("🎉 Event created successfully!");
+                    setSuccessMessage("🎉 האירוע נוצר בהצלחה!");
                     setFormData({
                         name: "",
                         date: "",
@@ -125,7 +124,7 @@ const EventForm = ({user, onEventCreated}) => {
                     onEventCreated();
                     return;
                 } else {
-                    throw new Error("Failed to create event.");
+                    throw new Error("יצירת האירוע נכשלה.");
                 }
             }
 
@@ -136,58 +135,61 @@ const EventForm = ({user, onEventCreated}) => {
             if (paymentResponse.data.approval_url) {
                 window.location.href = paymentResponse.data.approval_url;
             } else {
-                throw new Error("Failed to create PayPal payment.");
+                throw new Error("נכשל ביצירת תשלום PayPal.");
             }
         } catch (err) {
-            setError("Failed to process request. Please try again.");
+            setError("שגיאה בבקשה. אנא נסה שוב.");
             console.error(err);
         } finally {
             setLoading(false);
         }
     };
 
+    const InputField = ({icon, ...props}) => (
+        <div className="flex items-center bg-gray-100 border rounded-md p-3">
+            {icon}
+            <input {...props}
+                   className="flex-1 bg-transparent border-none outline-none mr-3 text-gray-900 placeholder-gray-500"
+                   required/>
+        </div>
+    );
+
+    const DateInputField = ({icon, value, onChange}) => (
+        <div className="flex items-center bg-gray-100 border rounded-md p-3">
+            {icon}
+            <DatePicker selected={value ? new Date(value) : null} onChange={onChange} dateFormat="yyyy-MM-dd"
+                        className="flex-1 bg-transparent border-none outline-none mr-3 text-gray-900 placeholder-gray-500"
+                        required/>
+        </div>
+    );
+
+
     return (
-        <div className="bg-white/30 backdrop-blur-md shadow-lg border border-white/20 rounded-xl p-6 max-w-md mx-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Create a New Event</h2>
+        <div className="bg-white/30 backdrop-blur-md shadow-lg border border-white/20 rounded-xl p-6 max-w-md mx-auto"
+             dir="rtl">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">צור אירוע חדש</h2>
             {validationError && <p className="text-red-500 mb-4">{validationError}</p>}
             {error && <p className="text-red-500 mb-4">{error}</p>}
-            {successMessage &&
-                <p className="text-green-600 mb-4">{successMessage}</p>}
+            {successMessage && <p className="text-green-600 mb-4">{successMessage}</p>}
             <form onSubmit={handleSubmit} className="space-y-4">
                 <InputField icon={<User/>} name="name" value={formData.name} onChange={handleInputChange}
-                            placeholder="Enter event name"/>
+                            placeholder="שם האירוע"/>
                 <DateInputField icon={<Calendar/>} name="date" value={formData.date} onChange={handleDateChange}/>
                 <InputField icon={<Phone/>} name="phone" value={formData.phone} onChange={handleInputChange}
-                            placeholder="Enter phone number"/>
+                            placeholder="מספר טלפון"/>
                 <InputField icon={<Users/>} name="num_guests" value={formData.num_guests} onChange={handleInputChange}
-                            placeholder="Enter number of guests (10-1000)"/>
+                            placeholder="מספר אורחים (10-1000)"/>
                 <InputField icon={<Image/>} name="num_images" value={formData.num_images} onChange={handleInputChange}
-                            placeholder="Enter number of images (100-10,000)"/>
-                <p className="text-lg font-semibold">Estimated Price: {price} ILS</p>
+                            placeholder="מספר תמונות (100-10,000)"/>
+                <p className="text-lg font-semibold">מחיר משוער: {price} ₪</p>
                 <button type="submit"
                         className="w-full bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700 transition"
-                        disabled={loading}>{loading ? "Creating..." : "Create Event"}</button>
+                        disabled={loading}>
+                    {loading ? "יוצר אירוע..." : "צור אירוע"}
+                </button>
             </form>
         </div>
     );
 };
-
-const InputField = ({icon, ...props}) => (
-    <div className="flex items-center bg-gray-100 border rounded-md p-3">
-        {icon}
-        <input {...props}
-               className="flex-1 bg-transparent border-none outline-none ml-3 text-gray-900 placeholder-gray-500"
-               required/>
-    </div>
-);
-
-const DateInputField = ({icon, value, onChange}) => (
-    <div className="flex items-center bg-gray-100 border rounded-md p-3">
-        {icon}
-        <DatePicker selected={value ? new Date(value) : null} onChange={onChange} dateFormat="yyyy-MM-dd"
-                    className="flex-1 bg-transparent border-none outline-none ml-3 text-gray-900 placeholder-gray-500"
-                    required/>
-    </div>
-);
 
 export default EventForm;

@@ -43,18 +43,21 @@ const EventList = ({user}) => {
     }, [user, navigate, fetchEvents]);
 
     return (
-        <motion.div initial="hidden" animate="visible" exit="hidden">
+        <motion.div initial="hidden" animate="visible" exit="hidden" dir="rtl"> {}
             <div className="max-w-7xl mx-auto px-6 py-8">
                 <motion.div className="flex justify-between items-center mb-8" variants={itemVariants}>
-                    <h1 className="text-3xl font-bold text-gray-900">Welcome, {user?.name || "Guest"}!</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">
+                        שלום, {user?.name || "אורח"}!
+                    </h1>
                     <button
                         className={`${
                             showForm ? "bg-red-600 hover:bg-red-700" : "bg-blue-600 hover:bg-blue-700"
                         } text-white py-2 px-4 rounded-md flex items-center`}
                         onClick={() => setShowForm((prev) => !prev)}
                     >
-                        {showForm ? <X className="h-5 w-5 mr-2"/> : <Plus className="h-5 w-5 mr-2"/>}
-                        {showForm ? "Hide Form" : "Create New Event"}
+                        {showForm ? <X className="h-5 w-5 ml-2"/> :
+                            <Plus className="h-5 w-5 ml-2"/>} {}
+                        {showForm ? "הסתר טופס" : "צור אירוע חדש"}
                     </button>
                 </motion.div>
 
@@ -72,7 +75,7 @@ const EventList = ({user}) => {
                     ) : (
                         <motion.p
                             className="text-xl text-gray-600 col-span-full text-center bg-gray-100 p-8 rounded-lg">
-                            No events found. Create a new one!
+                            לא נמצאו אירועים. צור אחד חדש!
                         </motion.p>
                     )}
                 </motion.div>

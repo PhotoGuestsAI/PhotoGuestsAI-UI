@@ -37,29 +37,29 @@ const Navbar = ({user, setUser}) => {
     };
 
     return (
-        <nav className="bg-white shadow-md sticky top-0 z-50">
+        <nav className="bg-white shadow-md sticky top-0 z-50" dir="rtl"> {}
             <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
                 <Link to="/" className="text-2xl font-bold text-blue-600">
-                    PhotoGuestsAI
+                    PhotoGuests
                 </Link>
-                <div className="flex space-x-4">
+                <div className="flex gap-x-4"> {}
                     <Link to="/" className="text-gray-700 hover:text-blue-600 flex items-center">
-                        <Home className="h-5 w-5 mr-1"/> Home
+                        <Home className="h-5 w-5 ml-1"/> דף הבית
                     </Link>
                     {user ? (
                         <>
                             <Link to="/events" className="text-gray-700 hover:text-blue-600 flex items-center">
-                                <Calendar className="h-5 w-5 mr-1"/> Events
+                                <Calendar className="h-5 w-5 ml-1"/> האירועים שלי
                             </Link>
                             <button
                                 onClick={handleSignOut}
                                 className="text-gray-700 hover:text-blue-600 flex items-center"
                             >
-                                <LogOut className="h-5 w-5 mr-1"/> Sign Out
+                                <LogOut className="h-5 w-5 ml-1"/> יציאה
                             </button>
                         </>
                     ) : (
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-reverse-4"> {}
                             <LogIn className="h-5 w-5 text-gray-700"/>
                             <GoogleLogin onSuccess={handleLoginSuccess} onError={() => console.error("Login Failed")}/>
                         </div>

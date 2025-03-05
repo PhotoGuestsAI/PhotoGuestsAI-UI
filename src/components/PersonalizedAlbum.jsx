@@ -24,7 +24,6 @@ const PersonalizedAlbum = () => {
     const [downloading, setDownloading] = useState(false);
 
     useEffect(() => {
-
         const fetchPhotos = async () => {
             try {
                 const API_BASE_URL = getBackendBaseUrl();
@@ -71,14 +70,14 @@ const PersonalizedAlbum = () => {
         }
     };
 
-    if (loading) return <p className="text-center text-lg">Loading album...</p>;
+    if (loading) return <p className="text-center text-lg">טוען את האלבום...</p>;
     if (error) return <p className="text-center text-red-500">{error}</p>;
 
     return (
-        <motion.div initial="hidden" animate="visible" exit="hidden">
+        <motion.div initial="hidden" animate="visible" exit="hidden" dir="rtl">
             <div className="max-w-7xl mx-auto px-6 py-8">
                 <motion.div className="flex justify-between items-center mb-8" variants={itemVariants}>
-                    <h1 className="text-3xl font-bold text-gray-900">Your Personalized Album</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">האלבום האישי שלך</h1>
 
                     {/* Download Album Button */}
                     <button
@@ -87,13 +86,13 @@ const PersonalizedAlbum = () => {
                             ${downloading ? "bg-gray-500 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
                         disabled={downloading}
                     >
-                        {downloading ? "Downloading..." : "Download Album"}
+                        {downloading ? "מוריד..." : "הורד אלבום"}
                     </button>
                 </motion.div>
 
                 {photos.length === 0 ? (
                     <motion.p className="text-xl text-gray-600 col-span-full text-center bg-gray-100 p-8 rounded-lg">
-                        No photos found for this album.
+                        לא נמצאו תמונות עבור אלבום זה.
                     </motion.p>
                 ) : (
                     <motion.div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" variants={listVariants}>
@@ -101,7 +100,7 @@ const PersonalizedAlbum = () => {
                             <motion.div key={index} variants={itemVariants}>
                                 <img
                                     src={photo}
-                                    alt={`Album ${index + 1}`}
+                                    alt={`תמונה ${index + 1}`}
                                     className="w-full h-40 object-cover rounded-lg shadow-md cursor-pointer"
                                     onClick={() => setSelectedPhoto(photo)} // Open modal on click
                                     onError={(e) => {
@@ -123,14 +122,14 @@ const PersonalizedAlbum = () => {
                             className="relative p-4"
                         >
                             <button
-                                className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-lg hover:bg-gray-200"
+                                className="absolute top-4 left-4 bg-white p-2 rounded-full shadow-lg hover:bg-gray-200"
                                 onClick={() => setSelectedPhoto(null)}
                             >
                                 <X className="h-6 w-6 text-black"/>
                             </button>
                             <img
                                 src={selectedPhoto}
-                                alt="Full-size"
+                                alt="תמונה בגודל מלא"
                                 className="max-w-full max-h-[90vh] rounded-lg shadow-lg"
                             />
                         </motion.div>
