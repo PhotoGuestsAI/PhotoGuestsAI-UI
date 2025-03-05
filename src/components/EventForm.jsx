@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useCallback} from "react";
 import axios from "axios";
 import {Calendar, Phone, User, Users, Image} from "lucide-react";
 import DatePicker from "react-datepicker";
@@ -23,6 +23,17 @@ const pricingTiers = [
     {guests: 1000, images: 5000, price: 800},
     {guests: 1000, images: 10000, price: 1200}
 ];
+
+const InputField = React.memo(({icon, ...props}) => (
+    <div className="flex items-center bg-gray-100 border rounded-md p-3">
+        {icon}
+        <input
+            {...props}
+            className="flex-1 bg-transparent border-none outline-none mr-3 text-gray-900 placeholder-gray-500 w-full"
+            required
+        />
+    </div>
+));
 
 const EventForm = ({user, onEventCreated}) => {
     const [formData, setFormData] = useState({
@@ -57,15 +68,13 @@ const EventForm = ({user, onEventCreated}) => {
         return true;
     };
 
-    const handleInputChange = (e) => {
+    const handleInputChange = useCallback((e) => {
         const {name, value} = e.target;
         setFormData((prev) => ({
             ...prev,
-            [name]: (name === "num_guests" || name === "num_images")
-                ? (value.trim() === "" ? "" : parseInt(value, 10) || "")
-                : value
+            [name]: value
         }));
-    };
+    }, []);
 
     const handleDateChange = (date) => {
         setFormData({...formData, date: date ? date.toISOString().split('T')[0] : ""});
@@ -145,24 +154,6 @@ const EventForm = ({user, onEventCreated}) => {
         }
     };
 
-    const InputField = ({icon, ...props}) => (
-        <div className="flex items-center bg-gray-100 border rounded-md p-3">
-            {icon}
-            <input {...props}
-                   className="flex-1 bg-transparent border-none outline-none mr-3 text-gray-900 placeholder-gray-500"
-                   required/>
-        </div>
-    );
-
-    const DateInputField = ({icon, value, onChange}) => (
-        <div className="flex items-center bg-gray-100 border rounded-md p-3">
-            {icon}
-            <DatePicker selected={value ? new Date(value) : null} onChange={onChange} dateFormat="yyyy-MM-dd"
-                        className="flex-1 bg-transparent border-none outline-none mr-3 text-gray-900 placeholder-gray-500"
-                        required/>
-        </div>
-    );
-
 
     return (
         <div className="bg-white/30 backdrop-blur-md shadow-lg border border-white/20 rounded-xl p-6 max-w-md mx-auto"
@@ -172,24 +163,60 @@ const EventForm = ({user, onEventCreated}) => {
             {error && <p className="text-red-500 mb-4">{error}</p>}
             {successMessage && <p className="text-green-600 mb-4">{successMessage}</p>}
             <form onSubmit={handleSubmit} className="space-y-4">
-                <InputField icon={<User/>} name="name" value={formData.name} onChange={handleInputChange}
-                            placeholder="שם האירוע"/>
-                <DateInputField icon={<Calendar/>} name="date" value={formData.date} onChange={handleDateChange}/>
-                <InputField icon={<Phone/>} name="phone" value={formData.phone} onChange={handleInputChange}
-                            placeholder="מספר טלפון"/>
-                <InputField icon={<Users/>} name="num_guests" value={formData.num_guests} onChange={handleInputChange}
-                            placeholder="מספר אורחים (10-1000)"/>
-                <InputField icon={<Image/>} name="num_images" value={formData.num_images} onChange={handleInputChange}
-                            placeholder="מספר תמונות (100-10,000)"/>
+                <InputField
+                    icon={<User/>}
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    placeholder="שם האירוע"
+                />
+                <DateInputField
+                    icon={<Calendar/>}
+                    name="date"
+                    value={formData.date}
+                    onChange={handleDateChange}
+                />
+                <InputField
+                    icon={<Phone/>}
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    placeholder="מספר טלפון"
+                />
+                <InputField
+                    icon={<Users/>}
+                    name="num_guests"
+                    value={formData.num_guests}
+                    onChange={handleInputChange}
+                    placeholder="מספר אורחים (10-1000)"
+                />
+                <InputField
+                    icon={<Image/>}
+                    name="num_images"
+                    value={formData.num_images}
+                    onChange={handleInputChange}
+                    placeholder="מספר תמונות (100-10,000)"
+                />
                 <p className="text-lg font-semibold">מחיר משוער: {price} ₪</p>
-                <button type="submit"
-                        className="w-full bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700 transition"
-                        disabled={loading}>
+                <button
+                    type="submit"
+                    className="w-full bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700 transition"
+                    disabled={loading}
+                >
                     {loading ? "יוצר אירוע..." : "צור אירוע"}
                 </button>
             </form>
         </div>
     );
 };
+
+const DateInputField = ({icon, value, onChange}) => (
+    <div className="flex items-center bg-gray-100 border rounded-md p-3">
+        {icon}
+        <DatePicker selected={value ? new Date(value) : null} onChange={onChange} dateFormat="yyyy-MM-dd"
+                    className="flex-1 bg-transparent border-none outline-none mr-3 text-gray-900 placeholder-gray-500"
+                    required/>
+    </div>
+);
 
 export default EventForm;
