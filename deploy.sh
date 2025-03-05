@@ -52,4 +52,4 @@ else
 
     # Stop the Green frontend
     docker-compose stop frontend-green
-Fi
+fi
