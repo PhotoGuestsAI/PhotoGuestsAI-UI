@@ -35,6 +35,37 @@ const InputField = React.memo(({icon, ...props}) => (
     </div>
 ));
 
+const DateInputField = React.memo(({icon, value, onChange}) => {
+    const handleDateChange = (date) => {
+        if (date) {
+            // Create a new date object with time set to noon to avoid timezone issues
+            const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0);
+            onChange(adjustedDate);
+        } else {
+            onChange(null);
+        }
+    };
+
+    return (
+        <div className="flex items-center bg-gray-100 border rounded-md p-3">
+            {icon}
+            <DatePicker
+                selected={value ? new Date(value) : null}
+                onChange={handleDateChange}
+                dateFormat="yyyy-MM-dd"
+                className="flex-1 bg-transparent border-none outline-none mr-3 text-gray-900 placeholder-gray-500"
+                placeholderText="תאריך האירוע"
+                required
+                fixedHeight
+                showMonthDropdown
+                showYearDropdown
+                dropdownMode="select"
+                todayButton="היום"
+            />
+        </div>
+    );
+});
+
 const EventForm = ({user, onEventCreated}) => {
     const [formData, setFormData] = useState({
         name: "",
@@ -159,9 +190,11 @@ const EventForm = ({user, onEventCreated}) => {
         <div className="bg-white/30 backdrop-blur-md shadow-lg border border-white/20 rounded-xl p-6 max-w-md mx-auto"
              dir="rtl">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">צור אירוע חדש</h2>
+
             {validationError && <p className="text-red-500 mb-4">{validationError}</p>}
             {error && <p className="text-red-500 mb-4">{error}</p>}
             {successMessage && <p className="text-green-600 mb-4">{successMessage}</p>}
+
             <form onSubmit={handleSubmit} className="space-y-4">
                 <InputField
                     icon={<User/>}
@@ -197,7 +230,9 @@ const EventForm = ({user, onEventCreated}) => {
                     onChange={handleInputChange}
                     placeholder="מספר תמונות (100-10,000)"
                 />
+
                 <p className="text-lg font-semibold">מחיר משוער: {price} ₪</p>
+
                 <button
                     type="submit"
                     className="w-full bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700 transition"
@@ -209,14 +244,5 @@ const EventForm = ({user, onEventCreated}) => {
         </div>
     );
 };
-
-const DateInputField = ({icon, value, onChange}) => (
-    <div className="flex items-center bg-gray-100 border rounded-md p-3">
-        {icon}
-        <DatePicker selected={value ? new Date(value) : null} onChange={onChange} dateFormat="yyyy-MM-dd"
-                    className="flex-1 bg-transparent border-none outline-none mr-3 text-gray-900 placeholder-gray-500"
-                    required/>
-    </div>
-);
 
 export default EventForm;
