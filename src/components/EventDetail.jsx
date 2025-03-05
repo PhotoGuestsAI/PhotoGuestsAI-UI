@@ -3,11 +3,12 @@ import {useState, useEffect} from "react";
 import axios from "axios";
 import {useParams, useNavigate, Link} from "react-router-dom";
 import EventQRCode from "./EventQRCode";
-import {Calendar, Upload} from "lucide-react";
+import {Calendar, Upload, FileText} from "lucide-react";
 
 const EventDetail = () => {
     const [event, setEvent] = useState(null);
     const [albumFile, setAlbumFile] = useState(null);
+    const [uploadedAlbum, setUploadedAlbum] = useState(null);
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [user, setUser] = useState(null);
 
@@ -28,7 +29,9 @@ const EventDetail = () => {
                 const response = await axios.get(`${API_BASE_URL}/events/${eventId}`, {
                     headers: {Authorization: `Bearer ${user.token}`},
                 });
+
                 setEvent(response.data);
+                setUploadedAlbum(response.data.album_name || "אין אלבום שהועלה עדיין");
 
                 if (response.data.email !== user.email) {
                     alert("אינך מורשה לצפות באירוע זה.");
@@ -65,11 +68,13 @@ const EventDetail = () => {
                     Authorization: `Bearer ${user?.token}`,
                 },
             });
-            alert("הקובץ הועלה בהצלחה!");
+
+            setUploadedAlbum(albumFile.name);
+            alert("📁 האלבום הועלה בהצלחה!");
             setAlbumFile(null);
         } catch (error) {
             console.error("Error uploading file:", error);
-            alert("אירעה שגיאה בעת העלאת הקובץ.");
+            alert("❌ אירעה שגיאה בעת העלאת הקובץ.");
         }
     };
 
@@ -77,7 +82,7 @@ const EventDetail = () => {
     if (!isAuthorized) return <div className="text-center text-lg text-red-600">אין לך הרשאה לצפות באירוע זה.</div>;
 
     return (
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="rtl"> {/* RTL Layout */}
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="rtl">
             <div className="bg-white shadow-md rounded-lg overflow-hidden p-6">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">{event.name}</h2>
                 <div className="flex items-center text-sm text-gray-500 mb-4">
@@ -86,14 +91,19 @@ const EventDetail = () => {
                 </div>
                 <p className="text-sm text-gray-600 mb-6">סטטוס: {event.status}</p>
 
+                {/* Album Upload Section */}
                 <div className="bg-gray-50 p-4 rounded-md mb-6">
-                    <h3 className="text-lg font-semibold mb-2">העלה או החלף את האלבום</h3>
+                    <h3 className="text-lg font-semibold mb-2">📤 העלה או החלף את האלבום</h3>
+
+                    {/* Upload file input */}
                     <input
                         type="file"
                         accept=".zip"
                         onChange={handleFileChange}
                         className="w-full border border-gray-300 rounded p-2 mb-4"
                     />
+
+                    {/* Upload Button */}
                     <button
                         onClick={handleUpload}
                         className="w-full bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700 transition flex items-center justify-center"
@@ -102,15 +112,17 @@ const EventDetail = () => {
                     </button>
                 </div>
 
+                {/* QR Code Section */}
                 <div className="mb-6">
                     <EventQRCode eventId={event.event_id}/>
                 </div>
 
+                {/* Guest Submission Form Link */}
                 <Link
                     to={`/events/${event.event_id}/guest-form`}
                     className="block text-center bg-green-600 text-white p-3 rounded-md hover:bg-green-700 transition"
                 >
-                    מילוי טופס רישום אורחים
+                    📋 מילוי טופס רישום אורחים
                 </Link>
             </div>
         </div>
