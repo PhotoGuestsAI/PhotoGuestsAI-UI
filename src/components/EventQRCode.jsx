@@ -2,7 +2,7 @@ import {QRCodeCanvas} from "qrcode.react";
 
 const EventQRCode = ({eventId}) => {
     const API_BASE_URL = "http://photoguests.com";
-    const eventFormUrl = `${API_BASE_URL}/guest-form/${eventId}`;
+    const eventFormUrl = `${API_BASE_URL}/events/${eventId}/guest-form`;
 
     return (
         <div className="text-center bg-white/30 backdrop-blur-md shadow-lg border border-white/20 rounded-xl p-6"
