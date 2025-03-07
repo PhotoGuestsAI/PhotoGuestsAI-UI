@@ -15,37 +15,38 @@ const EventDetail = () => {
     const {eventId} = useParams();
     const navigate = useNavigate();
 
+    // Load user from local storage on mount
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         setUser(storedUser);
     }, []);
 
-    useEffect(() => {
-        if (!eventId || !user?.token) return;
+    const fetchEventDetails = async () => {
+        try {
+            const API_BASE_URL = getBackendBaseUrl();
+            const response = await axios.get(`${API_BASE_URL}/events/${eventId}`, {
+                headers: {Authorization: `Bearer ${user?.token}`},
+            });
 
-        const fetchEventDetails = async () => {
-            try {
-                const API_BASE_URL = getBackendBaseUrl();
-                const response = await axios.get(`${API_BASE_URL}/events/${eventId}`, {
-                    headers: {Authorization: `Bearer ${user.token}`},
-                });
+            setEvent(response.data);
+            setUploadedAlbum(response.data.album_name || "אין אלבום שהועלה עדיין");
 
-                setEvent(response.data);
-                setUploadedAlbum(response.data.album_name || "אין אלבום שהועלה עדיין");
-
-                if (response.data.email !== user.email) {
-                    alert("אינך מורשה לצפות באירוע זה.");
-                    navigate("/");
-                } else {
-                    setIsAuthorized(true);
-                }
-            } catch (error) {
-                console.error("Error fetching event details:", error);
-                alert("אירעה שגיאה בעת קבלת פרטי האירוע.");
+            if (response.data.email !== user.email) {
+                alert("אינך מורשה לצפות באירוע זה.");
+                navigate("/");
+            } else {
+                setIsAuthorized(true);
             }
-        };
+        } catch (error) {
+            console.error("Error fetching event details:", error);
+            alert("אירעה שגיאה בעת קבלת פרטי האירוע.");
+        }
+    };
 
-        fetchEventDetails();
+    useEffect(() => {
+        if (eventId && user?.token) {
+            fetchEventDetails();
+        }
     }, [eventId, user, navigate]);
 
     const handleFileChange = (e) => {
@@ -57,7 +58,7 @@ const EventDetail = () => {
     const handleUpload = async () => {
         if (!albumFile) return alert("אנא בחר קובץ לפני ההעלאה.");
 
-        if (event?.status === "Album Uploaded") {
+        if (event?.status === "אלבום הועלה") {
             return alert("❌ לא ניתן להעלות אלבום חדש. אלבום כבר הועלה בעבר.");
         }
 
@@ -84,10 +85,12 @@ const EventDetail = () => {
                 },
             });
 
-            setUploadedAlbum(albumFile.name);
             alert("📁 האלבום הועלה בהצלחה!");
             setAlbumFile(null);
             document.getElementById("albumUploadInput").value = "";
+
+            // ✅ Refresh event details after successful upload
+            fetchEventDetails();
         } catch (error) {
             console.error("Error uploading file:", error);
             alert("❌ אירעה שגיאה בעת העלאת הקובץ.");
@@ -111,7 +114,7 @@ const EventDetail = () => {
                 <div className="bg-gray-50 p-4 rounded-md mb-6">
                     <h3 className="text-lg font-semibold mb-2">📤 העלה את האלבום</h3>
 
-                    {event?.status === "Album Uploaded" ? (
+                    {event?.status === "אלבום הועלה" ? (
                         <p className="text-red-600 font-semibold">❌ אלבום כבר הועלה. לא ניתן להעלות אלבום נוסף.</p>
                     ) : (
                         <>
@@ -122,14 +125,14 @@ const EventDetail = () => {
                                 id="albumUploadInput"
                                 onChange={handleFileChange}
                                 className="w-full border border-gray-300 rounded p-2 mb-4"
-                                disabled={event?.status === "אלבום הועלה"}
+                                disabled={event?.status !== "ממתין להעלאה"}
                             />
 
                             {/* Upload Button */}
                             <button
                                 onClick={handleUpload}
                                 className="w-full bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700 transition flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed"
-                                disabled={event?.status === "אלבום הועלה"}
+                                disabled={event?.status !== "ממתין להעלאה"}
                             >
                                 <Upload className="h-5 w-5 ml-2"/> העלאת אלבום
                             </button>
