@@ -57,6 +57,18 @@ const EventDetail = () => {
     const handleUpload = async () => {
         if (!albumFile) return alert("אנא בחר קובץ לפני ההעלאה.");
 
+        // Show confirmation dialog
+        const confirmUpload = window.confirm(
+            "⚠️ שים לב: לאחר ההעלאה, לא תוכל להחליף את האלבום. \n\nהאם אתה בטוח שזהו האלבום הנכון?"
+        );
+
+        if (!confirmUpload) {
+            // Reset file input and state when the user cancels
+            setAlbumFile(null);
+            document.getElementById("albumUploadInput").value = "";
+            return;
+        }
+
         const formData = new FormData();
         formData.append("album", albumFile);
 
@@ -72,6 +84,7 @@ const EventDetail = () => {
             setUploadedAlbum(albumFile.name);
             alert("📁 האלבום הועלה בהצלחה!");
             setAlbumFile(null);
+            document.getElementById("albumUploadInput").value = ""; // Reset file input field
         } catch (error) {
             console.error("Error uploading file:", error);
             alert("❌ אירעה שגיאה בעת העלאת הקובץ.");
@@ -93,12 +106,13 @@ const EventDetail = () => {
 
                 {/* Album Upload Section */}
                 <div className="bg-gray-50 p-4 rounded-md mb-6">
-                    <h3 className="text-lg font-semibold mb-2">📤 העלה או החלף את האלבום</h3>
+                    <h3 className="text-lg font-semibold mb-2">📤 העלה את האלבום</h3>
 
                     {/* Upload file input */}
                     <input
                         type="file"
                         accept=".zip"
+                        id="albumUploadInput"
                         onChange={handleFileChange}
                         className="w-full border border-gray-300 rounded p-2 mb-4"
                     />
