@@ -57,13 +57,16 @@ const EventDetail = () => {
     const handleUpload = async () => {
         if (!albumFile) return alert("אנא בחר קובץ לפני ההעלאה.");
 
+        if (event?.status === "Album Uploaded") {
+            return alert("❌ לא ניתן להעלות אלבום חדש. אלבום כבר הועלה בעבר.");
+        }
+
         // Show confirmation dialog
         const confirmUpload = window.confirm(
             "⚠️ שים לב: לאחר ההעלאה, לא תוכל להחליף את האלבום. \n\nהאם אתה בטוח שזהו האלבום הנכון?"
         );
 
         if (!confirmUpload) {
-            // Reset file input and state when the user cancels
             setAlbumFile(null);
             document.getElementById("albumUploadInput").value = "";
             return;
@@ -84,7 +87,7 @@ const EventDetail = () => {
             setUploadedAlbum(albumFile.name);
             alert("📁 האלבום הועלה בהצלחה!");
             setAlbumFile(null);
-            document.getElementById("albumUploadInput").value = ""; // Reset file input field
+            document.getElementById("albumUploadInput").value = "";
         } catch (error) {
             console.error("Error uploading file:", error);
             alert("❌ אירעה שגיאה בעת העלאת הקובץ.");
@@ -108,22 +111,30 @@ const EventDetail = () => {
                 <div className="bg-gray-50 p-4 rounded-md mb-6">
                     <h3 className="text-lg font-semibold mb-2">📤 העלה את האלבום</h3>
 
-                    {/* Upload file input */}
-                    <input
-                        type="file"
-                        accept=".zip"
-                        id="albumUploadInput"
-                        onChange={handleFileChange}
-                        className="w-full border border-gray-300 rounded p-2 mb-4"
-                    />
+                    {event?.status === "Album Uploaded" ? (
+                        <p className="text-red-600 font-semibold">❌ אלבום כבר הועלה. לא ניתן להעלות אלבום נוסף.</p>
+                    ) : (
+                        <>
+                            {/* Upload file input */}
+                            <input
+                                type="file"
+                                accept=".zip"
+                                id="albumUploadInput"
+                                onChange={handleFileChange}
+                                className="w-full border border-gray-300 rounded p-2 mb-4"
+                                disabled={event?.status === "אלבום הועלה"}
+                            />
 
-                    {/* Upload Button */}
-                    <button
-                        onClick={handleUpload}
-                        className="w-full bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700 transition flex items-center justify-center"
-                    >
-                        <Upload className="h-5 w-5 ml-2"/> העלאת אלבום
-                    </button>
+                            {/* Upload Button */}
+                            <button
+                                onClick={handleUpload}
+                                className="w-full bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700 transition flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                disabled={event?.status === "אלבום הועלה"}
+                            >
+                                <Upload className="h-5 w-5 ml-2"/> העלאת אלבום
+                            </button>
+                        </>
+                    )}
                 </div>
 
                 {/* QR Code Section */}
